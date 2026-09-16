@@ -6,6 +6,7 @@
 <title>Treino</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230B0D10'/%3E%3Cg stroke='%23F4F6F8' stroke-width='5' stroke-linecap='round'%3E%3Cline x1='14' y1='32' x2='50' y2='32'/%3E%3Cline x1='16' y1='22' x2='16' y2='42'/%3E%3Cline x1='48' y1='22' x2='48' y2='42'/%3E%3C/g%3E%3Cg stroke='%23FFD447' stroke-width='5' stroke-linecap='round'%3E%3Cline x1='9' y1='26' x2='9' y2='38'/%3E%3Cline x1='55' y1='26' x2='55' y2='38'/%3E%3C/g%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230B0D10'/%3E%3Cg stroke='%23F4F6F8' stroke-width='5' stroke-linecap='round'%3E%3Cline x1='14' y1='32' x2='50' y2='32'/%3E%3Cline x1='16' y1='22' x2='16' y2='42'/%3E%3Cline x1='48' y1='22' x2='48' y2='42'/%3E%3C/g%3E%3Cg stroke='%23FFD447' stroke-width='5' stroke-linecap='round'%3E%3Cline x1='9' y1='26' x2='9' y2='38'/%3E%3Cline x1='55' y1='26' x2='55' y2='38'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -179,6 +180,19 @@
   .vbar .plan{background:var(--panel2);opacity:1}
   .vbar .plan.fora{background:rgba(255,122,107,.35)}
   .vbar .feito{background:var(--feito);opacity:.85}
+  .acess{margin-top:16px;padding-top:13px;border-top:1px solid var(--line)}
+  .acessLinhas{display:flex;flex-wrap:wrap;gap:7px;margin-top:9px}
+  .acessLinhas span{background:var(--panel2);border-radius:6px;padding:6px 10px;font-size:12px;color:var(--dim)}
+  .acessLinhas b{color:var(--ink);font-family:'Barlow Condensed',sans-serif;font-size:16px;margin-right:6px}
+  .nota-sem textarea{width:100%;margin-top:8px}
+  .nota-sem .carimbo{font-size:11px;color:var(--dim);margin-top:6px}
+  .linhaAncora{display:flex;gap:8px;align-items:center;margin:8px 0}
+  .linhaAncora input[type=date]{flex:1;min-height:var(--toque);background:var(--panel2);color:var(--ink);
+    border:1px solid var(--line);border-radius:10px;padding:0 12px;font:inherit;font-size:15px}
+  .linhaAncora .acao{flex:0 0 auto;width:auto;padding:0 14px}
+  #novaVersao{position:fixed;left:12px;right:12px;bottom:calc(var(--toque) + 74px);z-index:60;
+    min-height:var(--toque);border:none;border-radius:12px;background:var(--sinal);color:var(--ground);
+    font:600 14px/1.3 inherit;box-shadow:0 8px 28px rgba(0,0,0,.5)}
   .vrow b{flex:0 0 44px;text-align:right;font-family:'Barlow Condensed',sans-serif;font-size:15px;color:var(--dim)}
 
   .delta{margin:18px 0 4px}
@@ -218,7 +232,7 @@
 
   /* ---------- barra de baixo ---------- */
   .dock{position:fixed;left:0;right:0;bottom:0;z-index:5;max-width:560px;margin:0 auto;
-    background:rgba(11,13,16,.93);backdrop-filter:blur(10px);border-top:1px solid var(--line);
+    background:rgba(11,13,16,.93);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-top:1px solid var(--line);
     padding-bottom:env(safe-area-inset-bottom)}
   .proxima{display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--line);min-height:56px}
   .proxima .relogio{font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:700;
@@ -336,7 +350,7 @@ const NIVEIS = {
         {id:'c3', s:3, reps:'12–15', rir:'2', desc:90},
         {id:'b6', s:2, reps:'10–15', rir:'2', desc:60},
         {id:'d2', s:2, reps:'12–20', rir:'2', desc:60},
-        {id:'e5', s:3, reps:'15–20', rir:'2', desc:60},
+        {id:'e5', s:4, reps:'15–20', rir:'2', desc:60},
         {id:'e6', s:3, reps:'12–20', rir:'2', desc:60}
       ]}
     ]
@@ -744,6 +758,30 @@ const NOMES = {peito:'peito',ombro:'ombro',ombroPost:'ombro posterior',triceps:'
   biceps:'bíceps',antebraco:'antebraço',dorsal:'dorsal',trapezio:'trapézio',lombar:'lombar',
   abs:'abdômen',gluteo:'glúteo',quad:'quadríceps',posterior:'posterior de coxa',panturrilha:'panturrilha'};
 
+/* Faixa de volume: só os nove grupos que os programas tratam como ALVO têm
+   faixa. Ombro posterior, trapézio, antebraço, abdômen e lombar entram quase
+   sempre como auxiliares, valendo meia série — nunca alcançam o piso, e antes
+   disto ficavam em vermelho permanente na aba Semana. Alerta que nunca apaga
+   não é alerta: ensina a ignorar o próximo. Agora eles são CONTADOS e
+   MOSTRADOS, mas não JULGADOS.                                             */
+const PRINCIPAIS = ['peito','dorsal','ombro','biceps','triceps','quad','posterior','gluteo','panturrilha'];
+const ACESSORIOS = ['ombroPost','trapezio','antebraco','abs','lombar'];
+
+/* 'predio' não tem faixa: as regras do próprio nível dizem que ele não é um
+   programa, é um complemento. Medir complemento com régua de programa acusa
+   excesso justamente quando você fez o que devia.                          */
+const FAIXAS = {ini:[8,12], int:[12,20], avz:[14,22], predio:null};
+
+/* A faixa é a do programa da semana, não a do nível que está selecionado
+   agora: trocar de nível reescrevia o julgamento do passado.               */
+function nivelDaSemana(ss){
+  const conta={};
+  (ss||[]).forEach(s=>{ if(s.nivel!=='predio') conta[s.nivel]=(conta[s.nivel]||0)+1; });
+  const ordenado=Object.keys(conta).sort((a,b)=>conta[b]-conta[a]);
+  if(ordenado.length) return ordenado[0];
+  return estado.nivel==='predio' ? null : estado.nivel;
+}
+
 function corpo(alvo, sec){
   const c = g => 'm' + (alvo.includes(g) ? ' a' : (sec.includes(g) ? ' s' : ''));
   return `<svg viewBox="0 0 104 100" role="img" aria-label="Músculo trabalhado: ${alvo.map(m=>NOMES[m]).join(', ')}">
@@ -867,7 +905,8 @@ NIVEIS.predio = {
       {id:'a6', s:3, reps:'10–15', rir:'1', desc:75},
       {id:'b6', s:2, reps:'10–15', rir:'1', desc:60},
       {id:'p5', s:3, reps:'12–20', rir:'0–1', desc:60},
-      {id:'p1', s:3, reps:'8–12', rir:'2', desc:150, opt:true, nota:'Opcional: só faça se o leg press estiver ocupado ou se quiser mais perna.'}
+      {id:'p1', s:3, reps:'8–12', rir:'2', desc:150, opt:true, nota:'Opcional: só faça se o leg press estiver ocupado ou se quiser mais perna.'},
+      {id:'p6', s:2, reps:'12–20', rir:'1', desc:60, opt:true, nota:'Opcional: abdominal no chão, quando sobrar tempo.'}
     ]},
     {id:'P2', letra:'P2', nome:'Corpo inteiro B', foco:'Posterior · Costas · Peito · Braço', ex:[
       {id:'p3', s:4, reps:'8–12', rir:'2', desc:150},
@@ -883,19 +922,21 @@ NIVEIS.predio = {
 };
 
 const CHAVE = 'treino-bluefit-v1';
-let estado = { nivel:'int', atual:null, aba:'agenda', aberto:null, mes:null, reg:{}, ses:{}, inicio:null };
+let estado = { nivel:'int', atual:null, aba:'agenda', aberto:null, mes:null, reg:{}, ses:{}, inicio:null, desc:null, notas:{} };
 let salvando=null, folhaAberta=null;
 
 /* ---------- armazenamento ---------- */
 let ondeSalva='verificando';
+let podeGravar=false;        /* trava: nada é gravado antes de carregar() terminar */
+let dadoResgatado=null;      /* nome da chave de quarentena, se houve corrupção */
+let persistente=null;        /* resultado de navigator.storage.persist() */
 const memoria={};
 const disco={
   async ler(c){
     if(window.storage){ try{ const r=await window.storage.get(c); if(r&&r.value){ondeSalva='app';return r;} }catch(e){} }
     try{ const v=localStorage.getItem(c); if(v!==null){ondeSalva='navegador';return {value:v};} }catch(e){}
     if(memoria[c]) return {value:memoria[c]};
-    await this.gravar(c,'{}');
-    return null;
+    return null;             /* não grava '{}' aqui: gravar antes de ler é como se perdia tudo */
   },
   async gravar(c,v){
     memoria[c]=v; let ok=false;
@@ -905,18 +946,50 @@ const disco={
     return ok;
   }
 };
+
+/* Pede ao navegador para não descartar o armazenamento por pressão de espaço.
+   É a resposta de graça ao problema que motivava @capacitor/preferences.      */
+async function fixarArmazenamento(){
+  try{
+    if(!navigator.storage || !navigator.storage.persist) return null;
+    if(await navigator.storage.persisted()) return true;
+    return await navigator.storage.persist();
+  }catch(e){ return null; }
+}
+
 function salvar(){
+  if(!podeGravar) return;    /* protege o disco enquanto a leitura não confirmou */
   clearTimeout(salvando);
   salvando=setTimeout(async()=>{ try{ await disco.gravar(CHAVE, JSON.stringify(estado)); }catch(e){} },350);
 }
+
 async function carregar(){
-  try{ const r=await disco.ler(CHAVE); if(r&&r.value) estado=Object.assign(estado, JSON.parse(r.value)); }catch(e){}
+  let bruto=null;
+  try{ const r=await disco.ler(CHAVE); if(r&&r.value) bruto=r.value; }catch(e){}
+
+  if(bruto!==null){
+    try{
+      estado=Object.assign(estado, JSON.parse(bruto));
+    }catch(e){
+      /* NÃO seguir com estado vazio por cima do dado ruim.
+         Guarda o original numa chave que o app nunca apaga e avisa em Ajustes. */
+      dadoResgatado = CHAVE+'.quebrado.'+Date.now();
+      try{ await disco.gravar(dadoResgatado, bruto); }catch(e2){ dadoResgatado='(não consegui salvar a cópia)'; }
+    }
+  }
+
   migrar();
-  if(!estado.inicio) estado.inicio=hoje();
+  if(!estado.inicio) estado.inicio=segundaDe(hoje());
+  if(estado.inicio !== segundaDe(estado.inicio) && !estado.ancoraLivre) estado.inicio=segundaDe(estado.inicio);
   const abertaHoje = sessoesDe(hoje()).find(s=>!s.fim);
   if(abertaHoje){ estado.atual=abertaHoje.id; estado.aba='treino'; }
   else if(!estado.atual) estado.aba='agenda';
   estado.mes = estado.mes || hoje().slice(0,7);
+
+  podeGravar=true;           /* só agora o app tem permissão de escrever */
+  persistente = await fixarArmazenamento();
+  salvar();
+  retomarDescanso();
   render();
 }
 
@@ -949,6 +1022,8 @@ function migrar(){
 const iso = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 const hoje = () => iso(new Date());
 const doIso = s => { const [a,m,d]=s.split('-').map(Number); return new Date(a,m-1,d); };
+/* texto do usuário que volta para dentro de HTML (a nota da semana) */
+const esc = t => String(t).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const DIAS_SEM=['dom','seg','ter','qua','qui','sex','sáb'];
 const MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
 function rotulo(data){
@@ -958,8 +1033,17 @@ function rotulo(data){
   if(data===iso(ontem)) return 'ontem';
   return `${DIAS_SEM[d.getDay()]}, ${d.getDate()} ${MESES[d.getMonth()].slice(0,3)}`;
 }
+/* A segunda-feira da semana de uma data. A âncora da semana era o dia em que
+   o app foi aberto pela primeira vez — quinta a quarta, se você abriu numa
+   quinta — e não havia tela para mudar. Tudo que é semanal pendia disso.   */
+function segundaDe(data){
+  const d=doIso(data);
+  const recuo=(d.getDay()+6)%7;      /* dom=0 vira 6; seg=1 vira 0 */
+  d.setDate(d.getDate()-recuo);
+  return iso(d);
+}
 function semanaDe(data){
-  const ini=doIso(estado.inicio||hoje()), d=doIso(data);
+  const ini=doIso(estado.inicio||segundaDe(hoje())), d=doIso(data);
   return Math.floor((d-ini)/(7*864e5))+1;
 }
 
@@ -997,12 +1081,21 @@ function contaSessao(s){
   return {tot, ok};
 }
 function exFeito(p){ const s=atual(); let n=0; for(let i=0;i<p.s;i++) if(pega(s.id,p.id,i).ok) n++; return n; }
+/* Carga estimada para 1 repetição (Epley). Serve só para COMPARAR séries
+   entre si: com carga isolada, 20 kg × 5 batia recorde sobre 18 kg × 12 —
+   exatamente o comportamento que o programa tenta evitar.                  */
+function e1rm(kg, reps){
+  const c=parseFloat(kg)||0, r=parseFloat(reps)||0;
+  if(!c) return 0;
+  if(!r) return c;                    /* série sem repetição anotada: usa a carga */
+  return c*(1+Math.min(r,30)/30);
+}
 function melhorMarca(exId, ignorar){
   let max=0;
   for(const c in estado.reg){
     if(c.indexOf('|'+exId+'|')===-1 || c===ignorar) continue;
     const r=estado.reg[c];
-    if(r.ok && parseFloat(r.kg)>max) max=parseFloat(r.kg);
+    if(r.ok){ const v=e1rm(r.kg,r.reps); if(v>max) max=v; }
   }
   return max;
 }
@@ -1056,7 +1149,7 @@ function render(){
   }
   ({agenda:telaAgenda, treino:telaTreino, volume:telaSemana, ajustes:telaAjustes})[estado.aba]();
   renderAbas();
-  if(!tInt) renderDock();
+  if(!descansoAtivo()) renderDock();
 }
 
 /* ---------- agenda ---------- */
@@ -1181,7 +1274,7 @@ function telaTreino(){
     const grava=marcar=>{
       const chave=k(s.id,ex,i), antes=melhorMarca(ex,chave);
       const feita = marcar===undefined? row.classList.contains('feita') : marcar;
-      const pr = feita && antes>0 && parseFloat(inKg.value)>antes;
+      const pr = feita && antes>0 && e1rm(inKg.value,inRp.value)>antes;
       estado.reg[chave]={kg:inKg.value, reps:inRp.value, ok:feita, pr};
       salvar();
     };
@@ -1213,7 +1306,7 @@ function telaTreino(){
     };
   });
   const bE=document.getElementById('encerrar');
-  if(bE) bE.onclick=()=>{ s.fim=Date.now(); estado.aberto=null; salvar(); render(); window.scrollTo({top:0}); if(navigator.vibrate) navigator.vibrate([30,50,30]); };
+  if(bE) bE.onclick=()=>{ s.fim=Date.now(); estado.aberto=null; encerrarDescanso(); soltarTela(); salvar(); render(); window.scrollTo({top:0}); if(navigator.vibrate) navigator.vibrate([30,50,30]); };
   const bR=document.getElementById('reabrir');
   if(bR) bR.onclick=()=>{ s.fim=null; salvar(); render(); };
   const bP=document.getElementById('btnRepetir');
@@ -1334,7 +1427,7 @@ function textoRelatorio(sem){
   const a=statsSemana(sem), b=statsSemana(sem-1);
   const c=comparaExercicios(a,b);
   const r=respostas(sem);
-  const nv=NIVEIS[estado.nivel];
+  const nv=NIVEIS[nivelDaSemana(a.ss) || estado.nivel];
   const n=x=> x%1? x.toFixed(1):x;
   const L=[];
   L.push(`RELATÓRIO DA SEMANA ${sem} — programa ${nv.nome}`);
@@ -1342,9 +1435,15 @@ function textoRelatorio(sem){
   L.push(`Séries: ${a.feitas} de ${a.planejadas} planejadas · Carga movida: ${a.carga.toLocaleString('pt-BR')} kg · Recordes: ${a.prs}`);
   L.push(`Semana anterior: ${b.ss.length} sessões, ${b.feitas} séries, ${b.carga.toLocaleString('pt-BR')} kg`);
   L.push('');
-  L.push('VOLUME POR MÚSCULO (feito/planejado):');
-  ['peito','dorsal','ombro','ombroPost','biceps','triceps','quad','posterior','gluteo','panturrilha','abs']
-    .filter(m=>a.mus[m]).forEach(m=> L.push(`- ${NOMES[m]}: ${n(a.feitoMus[m]||0)}/${n(a.mus[m])}`));
+  const fx=FAIXAS[nivelDaSemana(a.ss) || estado.nivel];
+  L.push(`VOLUME POR MÚSCULO ALVO (feito/planejado · faixa do programa: ${fx? fx[0]+' a '+fx[1]+' séries':'sem faixa, sessões avulsas'}):`);
+  PRINCIPAIS.filter(m=>a.mus[m]).forEach(m=>{
+    const v=a.feitoMus[m]||0;
+    const marca = fx ? (v<fx[0]?'  <- abaixo da faixa':v>fx[1]?'  <- acima da faixa':'') : '';
+    L.push(`- ${NOMES[m]}: ${n(v)}/${n(a.mus[m])}${marca}`);
+  });
+  const ac=ACESSORIOS.filter(m=>a.mus[m]);
+  if(ac.length) L.push('Acessórios (só contados, não têm faixa): '+ac.map(m=>`${NOMES[m]} ${n(a.feitoMus[m]||0)}`).join(', '));
   L.push('');
   L.push('CARGA POR EXERCÍCIO (melhor série):');
   Object.keys(a.ex).forEach(id=> L.push(`- ${EX[id].nome}: ${a.ex[id].kg} kg × ${a.ex[id].reps||'?'}`));
@@ -1356,6 +1455,18 @@ function textoRelatorio(sem){
   L.push('');
   L.push('CHECK-IN:');
   PERGUNTAS.forEach(p=> L.push(`- ${p.txt} ${r[p.id]||'(não respondeu)'}`));
+
+  /* Fecha o ciclo: o que foi recomendado na semana passada viaja junto com o
+     que de fato aconteceu nesta. Sem isto, cada semana recomeçava do zero.  */
+  const anterior=(estado.notas||{})[sem-1];
+  if(anterior && anterior.texto){
+    L.push('');
+    L.push(`O QUE VOCÊ RECOMENDOU NA SEMANA ${sem-1}:`);
+    L.push(anterior.texto.trim());
+    L.push('');
+    L.push('Confere primeiro se o que você mandou fazer foi feito, e diz onde não foi.');
+  }
+
   L.push('');
   L.push('Claude: avalia a semana, aponta o que travou e o que mudar. Pergunta o que faltar.');
   return L.join('\n');
@@ -1368,9 +1479,9 @@ function textoMes(mes){
   L.push(`FECHAMENTO DO MÊS ${mes} — programa ${NIVEIS[estado.nivel].nome}`);
   L.push(`Sessões: ${a.ss.length} em ${sems.length} semanas · Séries: ${a.feitas} de ${a.planejadas} · Carga: ${a.carga.toLocaleString('pt-BR')} kg · Recordes: ${a.prs}`);
   L.push('');
-  L.push('MÉDIA SEMANAL DE VOLUME POR MÚSCULO:');
-  ['peito','dorsal','ombro','ombroPost','biceps','triceps','quad','posterior','gluteo','panturrilha','abs']
-    .filter(m=>a.mus[m]).forEach(m=> L.push(`- ${NOMES[m]}: ${n((a.feitoMus[m]||0)/Math.max(sems.length,1))} séries/semana`));
+  L.push('MÉDIA SEMANAL DE VOLUME POR MÚSCULO ALVO:');
+  PRINCIPAIS.filter(m=>a.mus[m]).forEach(m=>
+    L.push(`- ${NOMES[m]}: ${n((a.feitoMus[m]||0)/Math.max(sems.length,1))} séries/semana`));
   L.push('');
   L.push('EVOLUÇÃO DE CARGA NO MÊS:');
   const prim=statsDe(a.ss.filter(s=>semanaDe(s.data)===sems[0]));
@@ -1394,9 +1505,10 @@ function telaSemana(){
   if(estado.semVer==null) estado.semVer = semanaDe(base);
   const sem = estado.semVer;
   const a = statsSemana(sem), b = statsSemana(sem-1);
-  const faixa={ini:[8,12],int:[12,20],avz:[14,22],predio:[3,6]}[estado.nivel];
+  const nvSem = nivelDaSemana(a.ss);
+  const faixa = nvSem ? FAIXAS[nvSem] : null;
   const larg=x=>Math.min(x/26*100,100), n=x=> x%1? x.toFixed(1):x;
-  const ordem=['peito','dorsal','ombro','ombroPost','biceps','triceps','quad','posterior','gluteo','panturrilha','abs'];
+  const nota = (estado.notas||{})[sem] || {};
   const c = comparaExercicios(a,b);
   const r = respostas(sem);
   const mesAtual = (a.ss[0]||{}).data ? a.ss[0].data.slice(0,7) : hoje().slice(0,7);
@@ -1415,15 +1527,24 @@ function telaSemana(){
       <div><b class="num">${a.prs}</b><small>PR</small></div>
     </div>
 
-    ${a.ss.length? ordem.filter(m=>a.mus[m]).map(m=>{
-      const fora=a.mus[m]<faixa[0]||a.mus[m]>faixa[1];
-      return `<div class="vrow"><span>${NOMES[m]}</span>
-        <div class="vbar">
-          <i class="faixa" style="left:${larg(faixa[0])}%;width:${larg(faixa[1])-larg(faixa[0])}%"></i>
-          <i class="plan${fora?' fora':''}" style="width:${larg(a.mus[m])}%"></i>
-          <i class="feito" style="width:${larg(a.feitoMus[m]||0)}%"></i>
-        </div><b>${n(a.feitoMus[m]||0)}/${n(a.mus[m])}</b></div>`;
-    }).join('') : '<p class="leg">Nenhum treino registrado nesta semana.</p>'}
+    ${!a.ss.length ? '<p class="leg">Nenhum treino registrado nesta semana.</p>' : `
+      ${faixa ? '' : '<p class="leg">Só sessões avulsas nesta semana — o app conta o volume, mas não julga contra faixa: complemento não é programa.</p>'}
+      ${PRINCIPAIS.filter(m=>a.mus[m]).map(m=>{
+        const fora = faixa && (a.mus[m]<faixa[0]||a.mus[m]>faixa[1]);
+        return `<div class="vrow"><span>${NOMES[m]}</span>
+          <div class="vbar">
+            ${faixa? `<i class="faixa" style="left:${larg(faixa[0])}%;width:${larg(faixa[1])-larg(faixa[0])}%"></i>`:''}
+            <i class="plan${fora?' fora':''}" style="width:${larg(a.mus[m])}%"></i>
+            <i class="feito" style="width:${larg(a.feitoMus[m]||0)}%"></i>
+          </div><b>${n(a.feitoMus[m]||0)}/${n(a.mus[m])}</b></div>`;
+      }).join('')}
+      ${ACESSORIOS.some(m=>a.mus[m]) ? `<div class="acess">
+        <h2>Acessórios — contados, sem faixa</h2>
+        <p class="leg">Entram quase sempre como auxiliares, valendo meia série. Não existe faixa semanal honesta pra eles: o número está aqui pra você ver, não pra ser cobrado.</p>
+        <div class="acessLinhas">${ACESSORIOS.filter(m=>a.mus[m]).map(m=>
+          `<span><b>${n(a.feitoMus[m]||0)}</b>${NOMES[m]}</span>`).join('')}</div>
+      </div>`:''}
+    `}
 
     ${(c.subiu.length||c.caiu.length||c.igual.length)? `<div class="delta">
       <h2>Comparado com a semana ${sem-1}</h2>
@@ -1444,6 +1565,13 @@ function telaSemana(){
     <button class="acao" id="copiarMes">Copiar fechamento do mês</button>
     <p class="leg" id="relMsg">Cole no chat com o Claude pra ele avaliar a semana e te questionar o que faltar.</p>
     <textarea id="rel" rows="4" readonly style="display:none"></textarea>
+
+    <div class="nota-sem">
+      <h2>Resposta do personal</h2>
+      <p class="leg">Cole aqui o que ele respondeu. O relatório da semana seguinte sai <b>já com isto dentro</b> — então ele cobra o que mandou fazer em vez de recomeçar do zero toda semana.</p>
+      <textarea id="notaSem" rows="4" placeholder="cole aqui a resposta da semana ${sem}…">${esc(nota.texto||'')}</textarea>
+      <p class="carimbo" id="notaCarimbo">${nota.ts? 'guardado em '+new Date(nota.ts).toLocaleString('pt-BR') : 'nada guardado nesta semana'}</p>
+    </div>
   </div>`;
 
   document.getElementById('semAnt').onclick=()=>{ if(sem>1){ estado.semVer=sem-1; render(); } };
@@ -1460,6 +1588,20 @@ function telaSemana(){
   };
   document.getElementById('copiarSem').onclick=()=>copia(textoRelatorio(sem),'Relatório copiado. Cola no chat com o Claude.');
   document.getElementById('copiarMes').onclick=()=>copia(textoMes(mesAtual),'Fechamento do mês copiado. Cola no chat com o Claude.');
+
+  const ta=document.getElementById('notaSem');
+  let espera=null;
+  const guardaNota=()=>{
+    estado.notas=estado.notas||{};
+    const t=ta.value.trim();
+    if(t) estado.notas[sem]={texto:t, ts:Date.now()};
+    else delete estado.notas[sem];
+    salvar();
+    const c=document.getElementById('notaCarimbo');
+    if(c) c.textContent = t? 'guardado agora' : 'nada guardado nesta semana';
+  };
+  ta.oninput=()=>{ clearTimeout(espera); espera=setTimeout(guardaNota,700); };
+  ta.onblur=guardaNota;
 }
 
 /* ---------- ajustes ---------- */
@@ -1475,16 +1617,65 @@ function telaAjustes(){
     <h2 style="margin-top:20px">Regras do ${nv.nome.toLowerCase()}</h2>
     <div class="regras">${nv.regras}</div>
 
+    <h2 style="margin-top:20px">Semana</h2>
+    <p class="leg">A semana 1 começa nesta data, e toda a aba Semana conta a partir dela. O padrão é a segunda-feira.</p>
+    <div class="linhaAncora">
+      <input type="date" id="ancora" value="${estado.inicio}">
+      <button class="acao" id="btnSegunda" style="margin:0">Usar a segunda-feira</button>
+    </div>
+    <p class="leg" id="ancoraMsg">Hoje é a semana ${semanaDe(hoje())}${doIso(estado.inicio).getDay()===1?'':' — atenção: sua âncora não cai numa segunda'}.</p>
+
     <h2 style="margin-top:20px">Backup</h2>
-    <p class="leg">Salvando em: <b style="color:var(--ink)">${ondeSalva}</b>.${ondeSalva==='só nesta sessão'?' Ao fechar a página os registros somem — abra o arquivo no Chrome em vez do visualizador, ou publique no GitHub Pages.':''}</p>
-    <p class="leg">${sessoes().length} sessões registradas desde ${rotulo(estado.inicio)}.</p>
+    ${dadoResgatado? `<p class="aviso">O último backup automático estava corrompido e <b>não foi apagado</b>: uma cópia crua ficou guardada em <code>${dadoResgatado}</code>. Os registros abaixo podem estar incompletos. Não limpe os dados do site antes de me mostrar essa chave.</p>`:''}
+    <p class="leg">Salvando em: <b style="color:var(--ink)">${ondeSalva}</b>${persistente===true?' · armazenamento fixado (o navegador não descarta)':persistente===false?' · o navegador pode descartar se faltar espaço — exporte o arquivo de vez em quando':''}.${ondeSalva==='só nesta sessão'?' Ao fechar a página os registros somem — abra o arquivo no Chrome em vez do visualizador, ou publique no GitHub Pages.':''}</p>
+    <p class="leg">${sessoes().length} sessões registradas desde ${rotulo(estado.inicio)}. Versão instalada: <b style="color:var(--ink)">${versaoApp||'verificando…'}</b>.</p>
+    <button class="acao forte" id="btnArquivo">Exportar arquivo de backup</button>
+    <input type="file" id="arqBkp" accept="application/json,.json" style="display:none">
+    <button class="acao" id="btnImportar">Restaurar de um arquivo</button>
     <textarea id="bkp" rows="3" readonly></textarea>
-    <button class="acao" id="btnCopiar">Copiar backup</button>
-    <button class="acao" id="btnRestaurar">Restaurar de um backup</button>
+    <button class="acao" id="btnCopiar">Copiar backup como texto</button>
+    <button class="acao" id="btnRestaurar">Restaurar de um texto colado</button>
     <p class="leg" id="bkpMsg"></p>
+
+    <h2 style="margin-top:20px">Aviso de fim de descanso</h2>
+    <p class="leg">O alarme sonoro e a vibração já funcionam com a tela apagada. A notificação é um extra para quando você sai do app.</p>
+    <button class="acao" id="btnNotif">${typeof Notification!=='undefined' && Notification.permission==='granted' ? 'Notificação autorizada' : 'Autorizar notificação'}</button>
+
     <p class="aviso">Monte a primeira semana com o professor da academia ao lado pra ajustar banco e amplitude. Dor articular aguda: pare o exercício e troque o padrão.</p>
   </div>`;
   document.querySelectorAll('[data-nivel]').forEach(b=> b.onclick=()=>{ estado.nivel=b.dataset.nivel; salvar(); render(); window.scrollTo({top:0}); });
+
+  const trocaAncora=nova=>{
+    if(!nova) return;
+    estado.inicio=nova;
+    estado.ancoraLivre = (nova!==segundaDe(nova));
+    estado.semVer=null; salvar(); render();
+  };
+  document.getElementById('ancora').onchange=e=> trocaAncora(e.target.value);
+  document.getElementById('btnSegunda').onclick=()=> trocaAncora(segundaDe(estado.inicio));
+
+  document.getElementById('btnArquivo').onclick=()=>{
+    const nome=`treino-${hoje()}.json`;
+    const blob=new Blob([JSON.stringify(estado,null,1)],{type:'application/json'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob); a.download=nome;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+    document.getElementById('bkpMsg').textContent='Arquivo '+nome+' gerado. Guarde fora do celular.';
+  };
+  document.getElementById('btnImportar').onclick=()=> document.getElementById('arqBkp').click();
+  document.getElementById('arqBkp').onchange=e=>{
+    const f=e.target.files&&e.target.files[0]; if(!f) return;
+    const leitor=new FileReader();
+    leitor.onload=()=>{ aplicarBackup(String(leitor.result), 'Arquivo restaurado.'); };
+    leitor.readAsText(f);
+  };
+  document.getElementById('btnNotif').onclick=async()=>{
+    try{
+      if(typeof Notification==='undefined'){ document.getElementById('bkpMsg').textContent='Este navegador não tem notificação.'; return; }
+      await Notification.requestPermission(); render();
+    }catch(e){}
+  };
   document.getElementById('btnCopiar').onclick=async()=>{
     const t=document.getElementById('bkp'); t.value=JSON.stringify(estado);
     try{ await navigator.clipboard.writeText(t.value); document.getElementById('bkpMsg').textContent='Backup copiado.'; }
@@ -1494,17 +1685,90 @@ function telaAjustes(){
     const t=document.getElementById('bkp'), msg=document.getElementById('bkpMsg');
     if(t.hasAttribute('readonly')){ t.removeAttribute('readonly'); t.value=''; t.focus();
       msg.textContent='Cole o backup acima e toque de novo em Restaurar.'; return; }
-    try{
-      const novo=JSON.parse(t.value); if(!novo.reg) throw new Error();
-      estado=Object.assign({nivel:'int',atual:null,aba:'ajustes',aberto:null,mes:null,reg:{},ses:{},inicio:hoje()}, novo);
-      migrar(); salvar(); render(); msg.textContent='Dados restaurados.';
-    }catch(e){ msg.textContent='Esse texto não é um backup válido.'; }
+    aplicarBackup(t.value, 'Dados restaurados.');
   };
 }
 
+/* Restaura de texto colado ou de arquivo. Antes de sobrescrever, guarda o
+   estado atual numa chave de socorro — restaurar backup errado era, até
+   agora, um caminho sem volta.                                            */
+function aplicarBackup(texto, msgOk){
+  const msg=document.getElementById('bkpMsg');
+  const diz=t=>{ if(msg) msg.textContent=t; };
+  let novo;
+  try{ novo=JSON.parse(texto); }catch(e){ diz('Esse conteúdo não é JSON válido.'); return; }
+  if(!novo || typeof novo!=='object' || !novo.reg){ diz('Falta o bloco de registros: não parece um backup do Treino.'); return; }
+  const antes=JSON.stringify(estado);
+  disco.gravar(CHAVE+'.antes-de-restaurar.'+Date.now(), antes).catch(()=>{});
+  estado=Object.assign({nivel:'int',atual:null,aba:'ajustes',aberto:null,mes:null,
+                        reg:{},ses:{},inicio:segundaDe(hoje()),desc:null,notas:{}}, novo);
+  migrar(); salvar(); render();
+  diz(msgOk+' A versão anterior ficou guardada, por segurança.');
+}
+
 /* ---------- barra inferior ---------- */
-let tInt=null, tRest=0, tNome='';
+/* ---------- descanso ----------
+   Era setInterval decrementando uma variável solta: congelava com a tela
+   apagada e sumia em qualquer recarga. Agora o que se guarda é o INSTANTE
+   em que o descanso acaba (em estado.desc, no disco), e o que resta é
+   sempre recalculado do relógio. Tela apagada, app trocado, recarga no meio
+   — o número continua certo.                                              */
+let tInt=null, travaTela=null, audioCtx=null, alarmes=[];
 const fmt=s=>Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
+const descansoAtivo = ()=> !!(estado.desc && estado.desc.fim);
+const restante = ()=> estado.desc && estado.desc.fim
+  ? Math.ceil((estado.desc.fim - Date.now())/1000) : 0;
+
+/* Trava de tela: a mão está ocupada e o celular apaga no meio da série. */
+async function segurarTela(){
+  try{
+    if(!('wakeLock' in navigator) || travaTela) return;
+    travaTela = await navigator.wakeLock.request('screen');
+    travaTela.addEventListener('release', ()=>{ travaTela=null; });
+  }catch(e){ travaTela=null; }
+}
+function soltarTela(){ try{ if(travaTela) travaTela.release(); }catch(e){} travaTela=null; }
+
+/* O alarme é agendado no relógio do áudio, não num setTimeout: assim ele
+   toca na hora certa mesmo com a aba estrangulada em segundo plano.       */
+function agendarAlarme(seg){
+  cancelarAlarme();
+  try{
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if(!AC) return;
+    audioCtx = audioCtx || new AC();
+    if(audioCtx.state==='suspended') audioCtx.resume();
+    const t0 = audioCtx.currentTime + Math.max(seg,0);
+    [0,0.42,0.84].forEach(atraso=>{
+      const osc=audioCtx.createOscillator(), vol=audioCtx.createGain();
+      osc.type='sine'; osc.frequency.value=880;
+      vol.gain.setValueAtTime(0.0001, t0+atraso);
+      vol.gain.exponentialRampToValueAtTime(0.5, t0+atraso+0.02);
+      vol.gain.exponentialRampToValueAtTime(0.0001, t0+atraso+0.28);
+      osc.connect(vol); vol.connect(audioCtx.destination);
+      osc.start(t0+atraso); osc.stop(t0+atraso+0.3);
+      alarmes.push(osc);
+    });
+  }catch(e){}
+}
+function cancelarAlarme(){
+  alarmes.forEach(o=>{ try{ o.stop(); o.disconnect(); }catch(e){} });
+  alarmes=[];
+}
+
+function encerrarDescanso(){
+  clearInterval(tInt); tInt=null;
+  cancelarAlarme();
+  estado.desc=null; salvar();
+}
+
+/* Chamado por carregar(): retoma um descanso que estava correndo quando o
+   app foi fechado, e descarta o que já venceu enquanto estava fora.       */
+function retomarDescanso(){
+  if(!descansoAtivo()) return;
+  if(restante()<=-90){ estado.desc=null; return; }   /* venceu faz tempo: esquece */
+  tocarRelogio();
+}
 function renderDock(){
   const el=document.getElementById('proxima'); el.className='proxima';
   if(estado.aba!=='treino' || !atual()){
@@ -1525,23 +1789,64 @@ function renderDock(){
   };
 }
 function iniciarTimer(seg){
-  clearInterval(tInt); tRest=seg;
-  const p=proximaSerie(); tNome=p? p.ex.nome : 'fim do treino';
-  pinta();
-  tInt=setInterval(()=>{ tRest--; pinta();
-    if(tRest<=0){ clearInterval(tInt); tInt=null;
-      if(navigator.vibrate) navigator.vibrate([120,60,120]);
-      setTimeout(renderDock,6000); }
-  },1000);
+  const p=proximaSerie();
+  estado.desc = { fim: Date.now()+seg*1000, nome: p? p.ex.nome : 'fim do treino', avisou:false };
+  salvar();
+  segurarTela();
+  agendarAlarme(seg);
+  tocarRelogio();
 }
+
+/* Um único laço que repinta a partir do relógio. 250 ms para o número virar
+   no instante certo; o custo é nulo porque só reescreve a barra de baixo.  */
+function tocarRelogio(){
+  clearInterval(tInt);
+  pinta();
+  tInt=setInterval(()=>{
+    if(!descansoAtivo()){ clearInterval(tInt); tInt=null; return; }
+    pinta();
+    const s=restante();
+    if(s<=0 && !estado.desc.avisou){
+      estado.desc.avisou=true; salvar();
+      if(navigator.vibrate) navigator.vibrate([120,60,120,60,200]);
+      avisarFimDoDescanso();
+    }
+    if(s<=-30){ encerrarDescanso(); renderDock(); }   /* limpa sozinho */
+  },250);
+}
+
+function avisarFimDoDescanso(){
+  try{
+    if(!('Notification' in window) || Notification.permission!=='granted') return;
+    const corpo = 'Próxima: '+((estado.desc&&estado.desc.nome)||'série');
+    if(navigator.serviceWorker && navigator.serviceWorker.ready){
+      navigator.serviceWorker.ready.then(reg=>
+        reg.showNotification('Descanso acabou', {body:corpo, tag:'descanso', silent:false})
+      ).catch(()=>{});
+    }else{
+      new Notification('Descanso acabou', {body:corpo, tag:'descanso'});
+    }
+  }catch(e){}
+}
+
 function pinta(){
   const el=document.getElementById('proxima');
-  el.className='proxima descanso'+(tRest<=0?' zerado':'');
-  el.innerHTML=`<div class="relogio">${fmt(Math.max(tRest,0))}</div>
-    <div class="info"><b>${tRest>0?'Descanso':'Pode ir'}</b><small>depois: ${tNome}</small></div>
-    <button class="agir" id="pular">${tRest>0?'Pular':'Ok'}</button>`;
-  document.getElementById('pular').onclick=()=>{ clearInterval(tInt); tInt=null; renderDock(); };
+  if(!el || !descansoAtivo()) return;
+  const s=restante();
+  el.className='proxima descanso'+(s<=0?' zerado':'');
+  el.innerHTML=`<div class="relogio">${fmt(Math.max(s,0))}</div>
+    <div class="info"><b>${s>0?'Descanso':'Pode ir'}</b><small>depois: ${estado.desc.nome}</small></div>
+    <button class="agir" id="pular">${s>0?'Pular':'Ok'}</button>`;
+  document.getElementById('pular').onclick=()=>{ encerrarDescanso(); renderDock(); };
 }
+
+/* Voltar ao app: repinta na hora (o intervalo pode ter sido estrangulado)
+   e recupera a trava de tela, que o sistema solta sozinho ao minimizar.   */
+document.addEventListener('visibilitychange', ()=>{
+  if(document.visibilityState!=='visible') return;
+  if(descansoAtivo()){ tocarRelogio(); }
+  if(atual() && !atual().fim) segurarTela();
+});
 function renderAbas(){
   const ic={
     agenda:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
@@ -1559,7 +1864,39 @@ function renderAbas(){
     nav.appendChild(b);
   });
 }
-if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
+/* ---------- versão instalada ----------
+   O service worker antigo era cache-first puro: depois da primeira
+   instalação o aparelho nunca mais recebia uma correção, sem nenhum sinal
+   na tela. Agora o documento vem pela rede primeiro, a versão aparece em
+   Ajustes, e quando chega uma nova o app avisa em vez de trocar embaixo do
+   seu treino.                                                             */
+let versaoApp='';
+function barraDeAtualizacao(){
+  if(document.getElementById('novaVersao')) return;
+  const b=document.createElement('button');
+  b.id='novaVersao'; b.type='button';
+  b.textContent='Nova versão pronta — tocar para atualizar';
+  b.onclick=()=>{ location.reload(); };
+  document.getElementById('app').appendChild(b);
+}
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+  navigator.serviceWorker.register('sw.js').then(reg=>{
+    reg.addEventListener('updatefound', ()=>{
+      const novo=reg.installing;
+      if(!novo) return;
+      novo.addEventListener('statechange', ()=>{
+        if(novo.state==='installed' && navigator.serviceWorker.controller) barraDeAtualizacao();
+      });
+    });
+    if(navigator.serviceWorker.controller) navigator.serviceWorker.controller.postMessage('versao');
+  }).catch(()=>{});
+  navigator.serviceWorker.addEventListener('message', e=>{
+    if(e.data && e.data.versao){
+      versaoApp=e.data.versao;
+      if(estado.aba==='ajustes') render();
+    }
+  });
+}
 carregar();
 
 </script>
