@@ -2,6 +2,3 @@ node_modules/
 dist/
 *.zip
 .DS_Store
-
-# não vão para o GitHub Pages:
-ferramentas/
