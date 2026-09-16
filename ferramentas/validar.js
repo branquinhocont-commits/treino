@@ -143,6 +143,40 @@ tit('d) Render do app num DOM falso');
     if(tela.length < 100) erro('a tela principal saiu vazia');     else ok(`tela principal com ${tela.length} caracteres`);
     if(abas !== 4)        erro(`esperava 4 abas, saíram ${abas}`); else ok('quatro abas montadas');
     if(!/cal|dia|treino/i.test(tela)) nota('a primeira tela não parece a agenda');
+
+    /* As quatro abas, não só a inicial: um erro em telaSemana ou telaAjustes
+       só aparece quando alguém toca nelas — ou seja, na academia.          */
+    for(const aba of ['agenda','treino','volume','ajustes']){
+      try{
+        vivo.estado.aba = aba;
+        vivo.render();
+        const saiu = vivo.escrito['tela'] || '';
+        if(saiu.length < 60) erro(`aba "${aba}" renderizou quase nada (${saiu.length} caracteres)`);
+        else ok(`aba "${aba}" renderiza (${saiu.length} caracteres)`);
+      }catch(e){
+        erro(`aba "${aba}" estourou: ${e.message}`);
+      }
+    }
+
+    /* Com uma sessão registrada, a aba Semana passa pelo caminho que conta
+       volume, compara com a semana anterior e monta a nota — o trecho mais
+       mexido e o que menos aparece num teste de tela vazia.                */
+    try{
+      const s = {id:'2026-09-15#1', data:'2026-09-15', nivel:'int', dia:'A', ts:Date.now(), fim:Date.now()};
+      vivo.estado.ses[s.id] = s;
+      const primeiro = vivo.NIVEIS.int.dias[0].ex[0];
+      vivo.estado.reg[`${s.id}|${primeiro.id}|0`] = {kg:'60', reps:'8', ok:true, pr:false};
+      vivo.estado.notas = {1:{texto:'suba 2,5 kg no supino', ts:Date.now()}};
+      vivo.estado.aba = 'volume'; vivo.estado.semVer = null;
+      vivo.render();
+      const semana = vivo.escrito['tela'] || '';
+      if(!/vbar/.test(semana)) erro('a aba Semana não desenhou nenhuma barra de volume com sessão registrada');
+      else ok('aba Semana desenha volume com sessão registrada');
+      if(!/nota-sem/.test(semana)) erro('o bloco da resposta do personal não apareceu');
+      else ok('bloco da resposta do personal presente');
+    }catch(e){
+      erro('a aba Semana estourou com sessão registrada: '+e.message);
+    }
   }catch(e){
     erro('o app estourou ao carregar: '+e.message);
   }
