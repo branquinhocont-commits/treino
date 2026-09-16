@@ -1,0 +1,1565 @@
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0B0D10">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Treino</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230B0D10'/%3E%3Cg stroke='%23F4F6F8' stroke-width='5' stroke-linecap='round'%3E%3Cline x1='14' y1='32' x2='50' y2='32'/%3E%3Cline x1='16' y1='22' x2='16' y2='42'/%3E%3Cline x1='48' y1='22' x2='48' y2='42'/%3E%3C/g%3E%3Cg stroke='%23FFD447' stroke-width='5' stroke-linecap='round'%3E%3Cline x1='9' y1='26' x2='9' y2='38'/%3E%3Cline x1='55' y1='26' x2='55' y2='38'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230B0D10'/%3E%3Cg stroke='%23F4F6F8' stroke-width='5' stroke-linecap='round'%3E%3Cline x1='14' y1='32' x2='50' y2='32'/%3E%3Cline x1='16' y1='22' x2='16' y2='42'/%3E%3Cline x1='48' y1='22' x2='48' y2='42'/%3E%3C/g%3E%3Cg stroke='%23FFD447' stroke-width='5' stroke-linecap='round'%3E%3Cline x1='9' y1='26' x2='9' y2='38'/%3E%3Cline x1='55' y1='26' x2='55' y2='38'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --ground:#0B0D10;
+    --panel:#14181D;
+    --panel2:#1B2027;
+    --line:#262C34;
+    --ink:#F4F6F8;
+    --dim:#868E9A;
+    --sinal:#FFD447;
+    --feito:#4ED8A0;
+    --alerta:#FF7A6B;
+    --alvo:#E5484D;
+    --aux:#5B8DEF;
+    --toque:46px;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  #app{
+    background:var(--ground);color:var(--ink);margin:0 auto;max-width:560px;
+    font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    font-size:14px;line-height:1.45;min-height:100vh;
+    padding-bottom:calc(150px + env(safe-area-inset-bottom));
+  }
+  #app button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit}
+  #app :focus-visible{outline:2px solid var(--sinal);outline-offset:2px}
+  .num{font-family:'Barlow Condensed',Inter,sans-serif;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:.2px}
+
+  /* ---------- topo ---------- */
+  .topo{display:flex;align-items:flex-start;gap:12px;padding:18px 16px 12px}
+  .topo h1{margin:0;font-size:27px;font-weight:700;letter-spacing:-.6px;line-height:1.05}
+  .topo p{margin:3px 0 0;font-size:12.5px;color:var(--dim)}
+  .tag{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:1.2px;
+    color:var(--ground);background:var(--sinal);padding:2px 7px;border-radius:5px;margin-bottom:7px}
+  .sem{margin-left:auto;text-align:right;min-width:56px}
+  .sem b{display:block;font-family:'Barlow Condensed',sans-serif;font-size:40px;font-weight:700;line-height:.85}
+  .sem small{display:block;font-size:10px;color:var(--dim);letter-spacing:1px;margin-top:3px}
+
+  /* ---------- fita dos dias ---------- */
+  .dias{display:flex;gap:0;padding:0 16px;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none}
+  .dias::-webkit-scrollbar{display:none}
+  .dia{flex:1 0 auto;min-width:52px;padding:9px 6px 11px;position:relative;text-align:center;color:var(--dim)}
+  .dia b{display:block;font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;line-height:1}
+  .dia i{display:block;width:5px;height:5px;border-radius:50%;background:var(--line);margin:5px auto 0}
+  .dia.feito i{background:var(--feito)}
+  .dia.parcial i{background:var(--sinal)}
+  .dia.sel{color:var(--ink)}
+  .dia.sel::after{content:'';position:absolute;left:8px;right:8px;bottom:-1px;height:2px;background:var(--ink)}
+
+  /* ---------- progresso ---------- */
+  .prog{display:flex;align-items:center;gap:10px;padding:12px 16px 6px}
+  .trilho{flex:1;height:3px;background:var(--panel2);border-radius:2px;overflow:hidden}
+  .trilho i{display:block;height:100%;width:0;background:var(--feito);transition:width .3s}
+  .prog span{font-size:11.5px;color:var(--dim);white-space:nowrap}
+
+  /* ---------- exercício ---------- */
+  .lista{padding:6px 12px 0}
+  .ex{border-bottom:1px solid var(--line)}
+  .cab{display:flex;align-items:center;gap:11px;width:100%;text-align:left;padding:12px 4px}
+  .mov{flex:0 0 52px;height:52px;background:var(--panel);border-radius:10px;padding:2px}
+  .mov svg{width:100%;height:100%;display:block}
+  .mov .b{fill:none;stroke:var(--ink);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+  .mov .eq{fill:none;stroke:var(--dim);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+  .mov .eq2{fill:none;stroke:#3A424D;stroke-width:2;stroke-dasharray:3 3}
+  .mov .mv{fill:none;stroke:var(--sinal);stroke-width:2.5;stroke-linecap:round}
+  .cab .txt{flex:1;min-width:0}
+  .cab h3{margin:0;font-size:14.5px;font-weight:600;letter-spacing:-.1px}
+  .cab .pres{margin:2px 0 0;font-size:11.5px;color:var(--dim)}
+  .cab .ant{margin:2px 0 0;font-size:11.5px;color:var(--sinal)}
+  .cont{flex:0 0 auto;font-family:'Barlow Condensed',sans-serif;font-size:17px;color:var(--dim);
+    min-width:34px;text-align:right}
+  .ex.pronto .cab h3{color:var(--dim)}
+  .ex.pronto .cont{color:var(--feito)}
+  .ex.opt .cab h3::after{content:' · opcional';font-weight:400;font-size:11px;color:var(--dim)}
+
+  .painel{padding:0 4px 14px}
+  .ex:not(.aberto) .painel{display:none}
+
+  /* ---------- séries ---------- */
+  .serie{display:flex;align-items:center;gap:6px;padding:5px 0}
+  .serie > .idx{flex:0 0 16px;font-family:'Barlow Condensed',sans-serif;font-size:15px;color:var(--dim);text-align:center}
+  .campo{display:flex;align-items:center;background:var(--panel);border-radius:9px;overflow:hidden}
+  .campo button{width:30px;height:var(--toque);font-size:17px;color:var(--dim);font-weight:600;flex:0 0 auto}
+  .campo button:active{background:var(--panel2);color:var(--ink)}
+  .campo input{width:46px;height:var(--toque);background:none;border:0;color:var(--ink);text-align:center;
+    font-family:'Barlow Condensed',sans-serif;font-size:19px;font-weight:600;padding:0}
+  .campo.reps input{width:34px}
+  .campo u{font-size:9.5px;color:var(--dim);text-decoration:none;padding-right:7px;letter-spacing:.3px}
+  .ok{flex:0 0 auto;width:44px;height:var(--toque);border-radius:9px;background:var(--panel);
+    color:var(--dim);font-size:17px;font-weight:700}
+  .serie.feita .ok{background:var(--feito);color:#06251A}
+  .serie.feita .campo{opacity:.5}
+  .serie.recorde .campo.kg{box-shadow:inset 0 0 0 1.5px var(--sinal)}
+  .serie.recorde .idx::after{content:'PR';display:block;font-family:Inter;font-size:8px;color:var(--sinal);font-weight:700}
+
+  /* ---------- detalhes do exercício ---------- */
+  .det{margin-top:10px;border-top:1px solid var(--line);padding-top:11px;display:flex;gap:12px}
+  .mapa{flex:0 0 74px;height:64px}
+  .mapa svg{width:100%;height:100%}
+  .mapa .m{fill:#2A313B} .mapa .a{fill:var(--alvo)} .mapa .s{fill:var(--aux)}
+  .det .txt{flex:1;min-width:0}
+  .det p{margin:0 0 7px;font-size:12.5px;color:var(--dim)}
+  .det p:last-child{margin-bottom:0}
+  .det .mus b{color:#F2686C}
+  .det .nota{color:var(--sinal)}
+  .det a{color:var(--ink);text-decoration:none;border-bottom:1px solid var(--line);font-size:12.5px}
+
+  .campo input.sug{color:var(--dim)}
+  .fechar{padding:18px 16px 8px}
+  .resumo{background:var(--panel);border-radius:13px;padding:16px}
+  .resumo h3{margin:0 0 13px;font-size:16px;font-weight:600}
+  .resumo .nums{display:flex;gap:10px;margin-bottom:12px}
+  .resumo .nums div{flex:1;background:var(--panel2);border-radius:10px;padding:10px 8px;text-align:center}
+  .resumo .nums b{display:block;font-size:23px;line-height:1}
+  .resumo .nums small{display:block;font-size:10px;color:var(--dim);margin-top:4px;letter-spacing:.3px}
+  .resumo .pend{font-size:12.5px;color:var(--sinal);margin:0 0 13px}
+  .resumo .pend.ok{color:var(--feito)}
+
+
+  /* ---------- calendário ---------- */
+  .cal{padding:14px 16px 0}
+  .calTopo{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+  .calTopo b{flex:1;text-align:center;font-size:15px;font-weight:600;text-transform:capitalize}
+  .calTopo button{width:38px;height:38px;border-radius:10px;background:var(--panel);font-size:19px}
+  .grade{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+  .cabdia{text-align:center;font-size:10px;color:var(--dim);padding-bottom:4px;letter-spacing:.5px}
+  .cel{aspect-ratio:1;border-radius:10px;background:var(--panel);display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:3px;color:var(--dim);font-size:13px;padding:0}
+  .cel.vazia{background:none}
+  .cel b{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:600}
+  .cel.tem{color:var(--ink);background:var(--panel2)}
+  .cel.hoje{box-shadow:inset 0 0 0 1.5px var(--sinal);color:var(--ink)}
+  .pts{display:flex;gap:2px;height:5px}
+  .pts i,.itemHist>i{width:5px;height:5px;border-radius:50%;display:block}
+  .pts i.fim,.itemHist>i.fim{background:var(--feito)}
+  .pts i.aberta,.itemHist>i.aberta{background:var(--sinal)}
+  .hist{margin-top:22px}
+  .hist h2{margin:0 0 10px;font-size:15px;font-weight:600}
+  .itemHist{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:11px 13px;
+    background:var(--panel);border-radius:11px;margin-bottom:7px}
+  .itemHist>b{font-family:'Barlow Condensed',sans-serif;font-size:19px;min-width:22px}
+  .itemHist div{flex:1;min-width:0}
+  .itemHist span{display:block;font-size:13.5px;font-weight:600}
+  .itemHist small{display:block;font-size:11.5px;color:var(--dim)}
+
+  /* ---------- folha deslizante ---------- */
+  .folha{position:fixed;inset:0;z-index:20;background:rgba(0,0,0,.6);display:none}
+  .folha.aberta{display:block}
+  .folhaCaixa{position:absolute;left:0;right:0;bottom:0;max-width:560px;margin:0 auto;
+    background:var(--ground);border-top:1px solid var(--line);border-radius:18px 18px 0 0;
+    max-height:82vh;display:flex;flex-direction:column;padding-bottom:env(safe-area-inset-bottom)}
+  .folhaCab{display:flex;align-items:center;padding:16px 16px 10px;border-bottom:1px solid var(--line)}
+  .folhaCab b{flex:1;font-size:17px;font-weight:600;text-transform:capitalize}
+  .folhaCab button{width:34px;height:34px;border-radius:9px;background:var(--panel);font-size:15px}
+  .folhaCorpo{overflow-y:auto;padding:14px 16px 22px}
+  .folhaCorpo .opt{margin-bottom:7px}
+  .folhaSub{font-size:11.5px;color:var(--dim);margin:0 0 9px;letter-spacing:.3px;text-transform:uppercase}
+  .opt .marca{font-size:12px;font-weight:600}
+
+  /* ---------- volume ---------- */
+  .bloco{padding:14px 16px 0}
+  .bloco h2{margin:0 0 3px;font-size:16px;font-weight:600}
+  .bloco .leg{margin:0 0 14px;font-size:12px;color:var(--dim)}
+  .vrow{display:flex;align-items:center;gap:9px;margin-bottom:9px;font-size:12.5px}
+  .vrow span{flex:0 0 92px}
+  .vbar{flex:1;position:relative;height:16px;background:var(--panel);border-radius:4px;overflow:hidden}
+  .vbar i{position:absolute;top:0;left:0;height:100%}
+  .vbar .faixa{background:rgba(244,246,248,.09)}
+  .vbar .plan{background:var(--panel2);opacity:1}
+  .vbar .plan.fora{background:rgba(255,122,107,.35)}
+  .vbar .feito{background:var(--feito);opacity:.85}
+  .vrow b{flex:0 0 44px;text-align:right;font-family:'Barlow Condensed',sans-serif;font-size:15px;color:var(--dim)}
+
+  .delta{margin:18px 0 4px}
+  .delta h2{margin:0 0 8px;font-size:15px;font-weight:600}
+  .delta p{margin:0 0 6px;font-size:12.5px;color:var(--dim)}
+  .delta .sobe{color:var(--feito)}
+  .delta .desce{color:var(--alerta)}
+  .checkin{margin:20px 0 16px}
+  .checkin h2{margin:0 0 3px;font-size:15px;font-weight:600}
+  .perg{margin-top:13px}
+  .perg > span{display:block;font-size:12.5px;margin-bottom:7px}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{padding:9px 12px;border-radius:9px;background:var(--panel);font-size:12.5px;color:var(--dim)}
+  .chip.sel{background:var(--sinal);color:var(--ground);font-weight:600}
+  .bloco .nums{display:flex;gap:7px}
+  .bloco .nums div{flex:1;background:var(--panel);border-radius:10px;padding:11px 5px;text-align:center}
+  .bloco .nums b{display:block;font-size:21px;line-height:1}
+  .bloco .nums small{display:block;font-size:9px;color:var(--dim);margin-top:4px;letter-spacing:.4px}
+
+  /* ---------- ajustes ---------- */
+  .opcoes{display:flex;flex-direction:column;gap:8px;margin-bottom:18px}
+  .opt{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--panel);border-radius:11px;text-align:left;width:100%}
+  .opt.sel{box-shadow:inset 0 0 0 1.5px var(--sinal)}
+  .opt b{display:block;font-size:14px;font-weight:600}
+  .opt small{display:block;font-size:11.5px;color:var(--dim);margin-top:2px}
+  .opt .marca{margin-left:auto;color:var(--sinal);font-size:15px}
+  .acao{width:100%;padding:13px;background:var(--panel);border-radius:11px;font-size:13.5px;font-weight:600;margin-bottom:8px}
+  .acao.forte{background:var(--sinal);color:var(--ground)}
+  .regras p{font-size:12.5px;color:var(--dim);margin:0 0 9px}
+  .regras b{color:var(--ink)}
+  .semctrl{display:flex;align-items:center;gap:10px;background:var(--panel);border-radius:11px;padding:9px 14px;margin-bottom:8px}
+  .semctrl span{flex:1;font-size:13.5px}
+  .semctrl button{width:38px;height:38px;border-radius:9px;background:var(--panel2);font-size:19px;font-weight:600}
+  #bkp{width:100%;background:var(--panel);border:1px solid var(--line);border-radius:10px;color:var(--ink);
+    font-family:inherit;font-size:11.5px;padding:10px;resize:vertical;margin-bottom:8px}
+  .aviso{font-size:11.5px;color:var(--dim);padding:0 0 24px}
+
+  /* ---------- barra de baixo ---------- */
+  .dock{position:fixed;left:0;right:0;bottom:0;z-index:5;max-width:560px;margin:0 auto;
+    background:rgba(11,13,16,.93);backdrop-filter:blur(10px);border-top:1px solid var(--line);
+    padding-bottom:env(safe-area-inset-bottom)}
+  .proxima{display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--line);min-height:56px}
+  .proxima .relogio{font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:700;
+    line-height:.9;min-width:64px;color:var(--sinal)}
+  .proxima .info{flex:1;min-width:0}
+  .proxima .info b{display:block;font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .proxima .info small{font-size:11.5px;color:var(--dim)}
+  .proxima .agir{flex:0 0 auto;padding:9px 13px;background:var(--panel2);border-radius:9px;font-size:12.5px;font-weight:600}
+  .proxima.descanso{border-bottom-color:rgba(255,212,71,.3)}
+  .proxima.zerado .relogio{color:var(--feito)}
+  .abas{display:flex}
+  .aba{flex:1;padding:9px 4px 11px;text-align:center;color:var(--dim);font-size:10.5px;letter-spacing:.3px}
+  .aba svg{display:block;margin:0 auto 3px;width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .aba.sel{color:var(--ink)}
+
+  @keyframes rep{
+    0%,10%  {transform:translate(0,0) rotate(0deg)}
+    45%,62% {transform:translate(var(--dx,0),var(--dy,0)) rotate(var(--r,0deg))}
+    95%,100%{transform:translate(0,0) rotate(0deg)}
+  }
+  .mov .an{animation:rep 3s cubic-bezier(.42,0,.4,1) infinite}
+  @media (prefers-reduced-motion:reduce){ .mov .an{animation:none} *{transition:none!important} }
+</style>
+
+<div id="app">
+  <header class="topo" id="cabecalho"></header>
+
+  <div class="prog" id="prog">
+    <div class="trilho"><i id="bar"></i></div>
+    <span id="progTxt"></span>
+  </div>
+
+  <main id="tela"></main>
+
+  <div class="dock">
+    <div class="proxima" id="proxima"></div>
+    <nav class="abas" id="abas"></nav>
+  </div>
+  <div class="folha" id="folha"></div>
+</div>
+
+<script>
+/* ---- biblioteca de exercícios (nome, aparelho, execução) ---- */
+const EX = {
+  a1:{nome:'Supino reto com halteres', maq:'Banco reto + halteres', dica:'Desce em 2 s até os halteres na linha do peito, alongando. É a parte de baixo que faz o peito crescer, não a de cima.'},
+  a2:{nome:'Supino inclinado na máquina', maq:'Máquina de supino inclinado ou Smith a 30°', dica:'Banco no primeiro furo. Inclinação alta demais transforma o exercício em desenvolvimento.'},
+  a3:{nome:'Crucifixo na máquina (peck deck)', maq:'Peck deck', dica:'Abre até sentir o peito esticar, sem forçar o ombro. Volta controlado, sem bater as placas.'},
+  a4:{nome:'Desenvolvimento sentado com halteres', maq:'Banco 90° + halteres', dica:'Cotovelo levemente à frente do corpo. Desce até o halter na altura da orelha.'},
+  a5:{nome:'Elevação lateral na polia', maq:'Polia baixa, um braço por vez', dica:'A polia mantém tensão embaixo, onde o halter perde. Sobe até a linha do ombro e desce devagar.'},
+  a6:{nome:'Tríceps na polia com corda', maq:'Polia alta + corda', dica:'Cotovelo colado no tronco. Abre a corda no fim e trava 1 s.'},
+  a7:{nome:'Tríceps testa com barra W', maq:'Barra W + banco reto', dica:'Desce a barra atrás da testa: alonga a cabeça longa do tríceps, que o pulley não pega.'},
+  b1:{nome:'Puxada frente pegada aberta', maq:'Pulley alto, barra reta', dica:'Solta até esticar o braço e sentir a dorsal alongar em cima. Peito pra cima, barra na clavícula.'},
+  b2:{nome:'Remada baixa com triângulo', maq:'Remada baixa sentada', dica:'Tronco quase parado. Deixa a escápula abrir na volta, sem soltar o peso.'},
+  b3:{nome:'Remada articulada unilateral', maq:'Remada máquina, um braço', dica:'Um lado por vez dobra a amplitude no fim do movimento. Deixa o braço esticar até o fundo.'},
+  b4:{nome:'Pullover na polia', maq:'Polia alta, barra reta ou corda', dica:'Braço quase esticado, movimento só no ombro. Dorsal isolada, sem bíceps.'},
+  b5:{nome:'Rosca direta na barra W', maq:'Barra W', dica:'Desce até esticar o cotovelo. Sem jogar o quadril: se precisa balançar, a carga está alta.'},
+  b6:{nome:'Rosca martelo', maq:'Halteres, pegada neutra', dica:'Pega braquial e braquiorradial, que engrossam o braço visto de lado.'},
+  b7:{nome:'Face pull', maq:'Polia alta + corda', dica:'Puxa até a testa com cotovelo alto. Ombro posterior é o músculo mais esquecido do corpo.'},
+  c1:{nome:'Agachamento no Smith', maq:'Smith, pés um pouco à frente', dica:'Desce até a coxa passar da paralela. Pé à frente carrega mais o quadríceps e poupa o joelho.'},
+  c2:{nome:'Leg press 45°', maq:'Leg press 45', dica:'Desce o máximo que der sem o quadril descolar do banco. Amplitude curta aqui é desperdício.'},
+  c3:{nome:'Cadeira extensora', maq:'Extensora', dica:'Segura 1 s em cima e desce devagar. Encosto reclinado alonga mais o reto femoral.'},
+  c4:{nome:'Cadeira flexora', maq:'Flexora sentada', dica:'Sentada alonga mais o posterior que a mesa deitada. Segura 1 s na contração.'},
+  c5:{nome:'Panturrilha em pé', maq:'Máquina de panturrilha em pé ou Smith', dica:'Pausa de 2 s lá embaixo, calcanhar bem abaixo do degrau. Sem quicar.'},
+  c6:{nome:'Abdominal na polia ajoelhado', maq:'Polia alta + corda', dica:'Encurta a distância entre esterno e quadril. Não puxa com o braço.'},
+  d1:{nome:'Remada com halter apoiado no banco', maq:'Banco reto + halter, um braço', dica:'Deixa o halter descer até esticar a dorsal antes de puxar. Pegada neutra, amplitude longa.'},
+  d2:{nome:'Crucifixo inverso na máquina', maq:'Peck deck invertido', dica:'Carga leve e repetições altas. Aqui a carga alta só recruta trapézio.'},
+  d3:{nome:'Supino inclinado com halteres', maq:'Banco 30° + halteres', dica:'Segunda dose de peito na semana, com mais alongamento que a máquina.'},
+  d4:{nome:'Puxada supinada pegada fechada', maq:'Pulley alto, pegada supinada', dica:'Cotovelo rente ao corpo. Pega dorsal e bíceps na mesma série.'},
+  d5:{nome:'Elevação lateral na máquina', maq:'Máquina de elevação lateral ou halteres', dica:'Pode ir até a falha sem risco. Ombro lateral aguenta e pede volume alto.'},
+  d6:{nome:'Rosca no banco scott', maq:'Banco scott ou máquina de rosca', dica:'Desce até esticar por completo. O fundo do movimento é o que mais rende no bíceps.'},
+  d7:{nome:'Tríceps unilateral na polia', maq:'Polia alta, pegada supinada', dica:'Um braço por vez corrige diferença entre os lados.'},
+  e1:{nome:'Stiff com barra', maq:'Barra livre ou halteres', dica:'Joelho quase travado, quadril pra trás. Desce até puxar atrás da coxa e volta sem arredondar a lombar.'},
+  e2:{nome:'Elevação pélvica no Smith', maq:'Smith + banco', dica:'Queixo no peito, trava 2 s em cima apertando o glúteo.'},
+  e3:{nome:'Mesa flexora deitado', maq:'Mesa flexora', dica:'Quadril colado na mesa. Desce em 3 s: a excêntrica é onde o posterior sofre.'},
+  e4:{nome:'Leg press pés altos', maq:'Leg press 45, pés no alto da plataforma', dica:'Pé alto joga a carga pro glúteo e posterior em vez do quadríceps.'},
+  e5:{nome:'Cadeira abdutora', maq:'Abdutora', dica:'Tronco inclinado à frente pega muito melhor o glúteo médio.'},
+  e6:{nome:'Panturrilha sentado', maq:'Panturrilha sentada', dica:'Sentado pega o sóleo, que o exercício em pé não pega. Amplitude total, pausa embaixo.'},
+  e7:{nome:'Abdominal na máquina', maq:'Máquina de abdominal', dica:'Carga que faça falhar em 15, não em 40.'}
+};
+
+/* ---- três níveis ---- */
+const NIVEIS = {
+  ini:{
+    nome:'Iniciante', curto:'INI', sub:'até 6 meses de treino consistente',
+    plano:'3 dias · corpo inteiro · cada músculo 3x por semana',
+    deload:0,
+    regras:`<p><b>Seu objetivo nesta fase não é volume, é técnica e hábito.</b> Oito a doze séries por músculo na semana já entregam quase todo o ganho possível agora, e sobra energia pra você voltar na sessão seguinte.</p>
+      <p><b>RIR 3</b> em tudo: pare com 3 repetições ainda no tanque. Iniciante erra a estimativa por 3 a 5 repetições, então o que você chama de RIR 3 na prática já é RIR 1.</p>
+      <p><b>Suba carga quase toda semana.</b> Fez o topo da faixa nas 3 séries? Sobe 2,5 kg no braço e ombro, 5 kg no resto. É a única fase da vida em que isso funciona toda semana — aproveite.</p>
+      <p><b>Sem deload programado</b> nas primeiras 12 semanas. O volume ainda é baixo demais pra acumular fadiga que exija isso.</p>
+      <p><b>Corpo inteiro 3x</b> porque com 3 dias essa é a divisão que dá mais repetições de prática em cada padrão de movimento. Não é treino de iniciante por ser fraco, é por ser eficiente.</p>`,
+    dias:[
+      {id:'A', letra:'A', nome:'Corpo inteiro 1', foco:'Perna · Peito · Costas', ex:[
+        {id:'c1', s:3, reps:'8–10', rir:'3', desc:150},
+        {id:'a1', s:3, reps:'8–10', rir:'3', desc:150},
+        {id:'b1', s:3, reps:'8–12', rir:'3', desc:120},
+        {id:'a4', s:2, reps:'10–12', rir:'3', desc:120},
+        {id:'c4', s:3, reps:'10–12', rir:'2–3', desc:90},
+        {id:'b5', s:2, reps:'10–12', rir:'2', desc:90},
+        {id:'c6', s:2, reps:'12–15', rir:'2', desc:60}
+      ]},
+      {id:'B', letra:'B', nome:'Corpo inteiro 2', foco:'Perna · Ombro · Costas', ex:[
+        {id:'c2', s:3, reps:'10–15', rir:'3', desc:150},
+        {id:'a2', s:3, reps:'10–12', rir:'3', desc:120},
+        {id:'b2', s:3, reps:'10–12', rir:'3', desc:120},
+        {id:'a5', s:3, reps:'12–15', rir:'2', desc:60},
+        {id:'e3', s:3, reps:'10–12', rir:'2–3', desc:90},
+        {id:'a6', s:4, reps:'10–15', rir:'2', desc:75},
+        {id:'c5', s:4, reps:'10–15', rir:'2', desc:60}
+      ]},
+      {id:'C', letra:'C', nome:'Corpo inteiro 3', foco:'Posterior · Peito · Costas', ex:[
+        {id:'e1', s:3, reps:'8–10', rir:'3', desc:150},
+        {id:'a3', s:3, reps:'10–15', rir:'2', desc:90},
+        {id:'b3', s:3, reps:'10–12', rir:'3', desc:120},
+        {id:'c3', s:3, reps:'12–15', rir:'2', desc:90},
+        {id:'b6', s:2, reps:'10–15', rir:'2', desc:60},
+        {id:'d2', s:2, reps:'12–20', rir:'2', desc:60},
+        {id:'e5', s:3, reps:'15–20', rir:'2', desc:60},
+        {id:'e6', s:3, reps:'12–20', rir:'2', desc:60}
+      ]}
+    ]
+  },
+
+  int:{
+    nome:'Intermediário', curto:'INT', sub:'6 meses a 2 anos, carga sobe a cada 2–4 semanas',
+    plano:'5 dias · cada treino 1x por semana · cada músculo 2x',
+    deload:7,
+    regras:`<p><b>Progressão dupla.</b> Fique na mesma carga até bater o topo da faixa em todas as séries dentro do RIR alvo. Aí sobe 2,5 kg em braço e ombro, 5 kg em peito, costas e perna, e volta pro piso da faixa.</p>
+      <p><b>RIR 1–2 nos compostos, 0–1 nos isoladores.</b> A meta-análise de 2024 sobre proximidade da falha mostra ganho pequeno ao chegar mais perto, com retorno decrescente entre 0 e 1 RIR — não vale pagar o preço de recuperação em agachamento e supino.</p>
+      <p><b>Volume 12 a 20 séries por músculo</b>, contando série auxiliar como meia. Confira no painel de volume: quase toda ficha erra sobrando costas e faltando posterior de coxa.</p>
+      <p><b>Deload na semana 7</b>, e depois nas semanas 14, 21: metade das séries, mesma carga, RIR 4.</p>
+      <p><b>Mantenha os exercícios por 6 a 10 semanas.</b> Trocar toda semana impede saber se você progrediu, que é a única informação que importa aqui.</p>`,
+    dias:[
+      {id:'A', letra:'A', nome:'Empurrar', foco:'Peito · Ombro · Tríceps', ex:[
+        {id:'a1', s:4, reps:'6–8', rir:'2', desc:180},
+        {id:'a2', s:3, reps:'8–12', rir:'1–2', desc:150},
+        {id:'a3', s:3, reps:'12–15', rir:'0–1', desc:90, nota:'Na última série, parciais alongadas: falhou, continua na metade esticada até não sair mais.'},
+        {id:'a4', s:3, reps:'8–12', rir:'2', desc:150},
+        {id:'a5', s:4, reps:'12–20', rir:'0–1', desc:60},
+        {id:'a6', s:3, reps:'10–15', rir:'1', desc:75},
+        {id:'a7', s:2, reps:'10–12', rir:'1–2', desc:90, opt:true}
+      ]},
+      {id:'B', letra:'B', nome:'Puxar', foco:'Costas · Bíceps', ex:[
+        {id:'b1', s:4, reps:'8–12', rir:'2', desc:180},
+        {id:'b2', s:3, reps:'8–12', rir:'1–2', desc:150},
+        {id:'b3', s:3, reps:'10–12', rir:'1', desc:90},
+        {id:'b4', s:3, reps:'12–15', rir:'0–1', desc:75},
+        {id:'b5', s:3, reps:'8–12', rir:'1', desc:90},
+        {id:'b6', s:3, reps:'10–15', rir:'0–1', desc:60},
+        {id:'b7', s:3, reps:'15–20', rir:'1', desc:60, opt:true}
+      ]},
+      {id:'C', letra:'C', nome:'Pernas', foco:'Quadríceps · Panturrilha · Core', ex:[
+        {id:'c1', s:4, reps:'6–8', rir:'2', desc:180},
+        {id:'c2', s:4, reps:'10–15', rir:'1–2', desc:150},
+        {id:'c3', s:4, reps:'12–15', rir:'0–1', desc:90, nota:'Última série com drop: falhou, tira 2 placas e continua até falhar de novo.'},
+        {id:'c4', s:3, reps:'10–12', rir:'1', desc:90},
+        {id:'c5', s:6, reps:'10–15', rir:'0–1', desc:60},
+        {id:'c6', s:3, reps:'12–15', rir:'1', desc:60}
+      ]},
+      {id:'D', letra:'D', nome:'Superior 2', foco:'Costas · Peito · Ombro · Braço', ex:[
+        {id:'d1', s:4, reps:'10–12', rir:'1–2', desc:120},
+        {id:'d2', s:3, reps:'12–20', rir:'0–1', desc:60},
+        {id:'d3', s:3, reps:'8–12', rir:'1–2', desc:120},
+        {id:'d4', s:3, reps:'8–12', rir:'1', desc:120},
+        {id:'d5', s:3, reps:'12–20', rir:'0–1', desc:60},
+        {id:'d6', s:3, reps:'10–12', rir:'0–1', desc:75},
+        {id:'d7', s:3, reps:'12–15', rir:'0–1', desc:60}
+      ]},
+      {id:'E', letra:'E', nome:'Posterior', foco:'Posterior de coxa · Glúteo · Panturrilha', ex:[
+        {id:'e1', s:4, reps:'8–10', rir:'2', desc:180},
+        {id:'e2', s:3, reps:'8–12', rir:'1–2', desc:150},
+        {id:'e3', s:3, reps:'10–15', rir:'0–1', desc:90},
+        {id:'e4', s:3, reps:'12–15', rir:'1', desc:120},
+        {id:'e5', s:3, reps:'15–20', rir:'0–1', desc:60},
+        {id:'e6', s:6, reps:'12–20', rir:'0–1', desc:60},
+        {id:'e7', s:3, reps:'12–15', rir:'1', desc:60, opt:true}
+      ]}
+    ]
+  },
+
+  avz:{
+    nome:'Avançado', curto:'AVZ', sub:'2 anos+, carga sobe a cada 4–8 semanas',
+    plano:'6 dias · empurrar, puxar e perna 2x · sessão pesada e sessão metabólica',
+    deload:6,
+    regras:`<p><b>Ondulação por sessão.</b> A primeira passagem de cada padrão na semana fica em 5 a 10 repetições, a segunda em 8 a 20. Cobre a faixa inteira e distribui o desgaste articular, que é o que limita quem já treina há anos.</p>
+      <p><b>Priorize 2 ou 3 grupos por bloco de 6 semanas</b>, deixando eles em 18 a 22 séries e os outros em 12 a 16. Priorizar tudo é não priorizar nada.</p>
+      <p><b>Bloco de volume crescente:</b> semana 1 no piso, some 1 série por músculo por semana até a semana 5, deload na 6. Recomeça com um pouco mais de carga.</p>
+      <p><b>Técnicas intensivas só na última série de isolador</b>, em 1 ou 2 exercícios por sessão. Nunca em agachamento, stiff ou supino pesado: risco alto, retorno baixo.</p>
+      <p><b>Parciais alongadas</b> onde estão marcadas. Depois de falhar na amplitude completa, continue repetindo só na metade esticada — nunca na encurtada. É a técnica com melhor suporte na literatura recente.</p>
+      <p><b>Antes de mexer no programa quando travar:</b> sono, calorias, proteína (1,6 a 2,2 g por kg) e fadiga acumulada. Nessa ordem. Programa é o último suspeito.</p>`,
+    dias:[
+      {id:'A', letra:'A', nome:'Empurrar pesado', foco:'Peito · Ombro · Tríceps', ex:[
+        {id:'a1', s:4, reps:'5–7', rir:'2', desc:180},
+        {id:'a2', s:3, reps:'8–10', rir:'1–2', desc:150},
+        {id:'a3', s:3, reps:'10–12', rir:'0–1', desc:90, nota:'Última série em myo-reps: falha, 15 s de pausa, mais 4 reps, repete 3 vezes.'},
+        {id:'a4', s:3, reps:'6–8', rir:'2', desc:150},
+        {id:'a5', s:3, reps:'12–20', rir:'0–1', desc:60},
+        {id:'a6', s:3, reps:'10–12', rir:'1', desc:75}
+      ]},
+      {id:'B', letra:'B', nome:'Puxar pesado', foco:'Costas · Bíceps', ex:[
+        {id:'b1', s:4, reps:'6–8', rir:'2', desc:180},
+        {id:'b2', s:4, reps:'8–10', rir:'1–2', desc:150},
+        {id:'b3', s:3, reps:'10–12', rir:'1', desc:90},
+        {id:'b5', s:3, reps:'8–10', rir:'1', desc:90},
+        {id:'b6', s:3, reps:'10–12', rir:'0–1', desc:60},
+        {id:'b7', s:3, reps:'15–20', rir:'0–1', desc:60}
+      ]},
+      {id:'C', letra:'C', nome:'Perna quadríceps', foco:'Quadríceps · Panturrilha', ex:[
+        {id:'c1', s:4, reps:'5–7', rir:'2', desc:210},
+        {id:'c2', s:5, reps:'8–12', rir:'1–2', desc:180},
+        {id:'c3', s:4, reps:'12–15', rir:'0', desc:90, nota:'Drop duplo na última: falha, tira 25% da carga, falha, tira mais 25%, falha.'},
+        {id:'c4', s:3, reps:'10–12', rir:'1', desc:90},
+        {id:'c5', s:6, reps:'8–12', rir:'0–1', desc:90, nota:'Parciais alongadas depois da falha, calcanhar bem abaixo do degrau.'},
+        {id:'c6', s:3, reps:'12–15', rir:'1', desc:60}
+      ]},
+      {id:'D', letra:'D', nome:'Empurrar metabólico', foco:'Peito · Ombro · Tríceps', ex:[
+        {id:'d3', s:4, reps:'8–12', rir:'1', desc:120},
+        {id:'a3', s:3, reps:'12–15', rir:'0–1', desc:75},
+        {id:'d5', s:4, reps:'12–20', rir:'0–1', desc:60},
+        {id:'a4', s:3, reps:'10–12', rir:'1–2', desc:120},
+        {id:'d7', s:3, reps:'12–15', rir:'0–1', desc:60},
+        {id:'a7', s:3, reps:'10–12', rir:'1', desc:90}
+      ]},
+      {id:'E', letra:'E', nome:'Puxar volume', foco:'Costas · Ombro posterior · Bíceps', ex:[
+        {id:'d4', s:4, reps:'8–12', rir:'1–2', desc:150},
+        {id:'d1', s:4, reps:'10–12', rir:'1', desc:120},
+        {id:'b4', s:3, reps:'12–15', rir:'0–1', desc:75},
+        {id:'d2', s:4, reps:'15–20', rir:'0–1', desc:60},
+        {id:'d6', s:3, reps:'10–12', rir:'0–1', desc:75, nota:'Scott favorece o fundo do movimento. Parciais alongadas na última série.'},
+        {id:'b6', s:3, reps:'12–15', rir:'0–1', desc:60}
+      ]},
+      {id:'F', letra:'F', nome:'Posterior e glúteo', foco:'Posterior de coxa · Glúteo · Panturrilha', ex:[
+        {id:'e1', s:4, reps:'6–8', rir:'2', desc:210},
+        {id:'e2', s:4, reps:'8–12', rir:'1', desc:150},
+        {id:'e3', s:4, reps:'10–15', rir:'0–1', desc:90},
+        {id:'e4', s:3, reps:'12–15', rir:'1', desc:120},
+        {id:'e5', s:3, reps:'15–20', rir:'0–1', desc:60},
+        {id:'e6', s:6, reps:'12–20', rir:'0–1', desc:60},
+        {id:'e7', s:3, reps:'12–15', rir:'1', desc:60, opt:true}
+      ]}
+    ]
+  }
+};
+
+const DIAS = ()=> NIVEIS[estado.nivel].dias;
+
+/* ---- pictogramas articulados ----
+   eq = equipamento fixo · corpo = partes estáticas
+   ch = cadeias de juntas: p = pivô, r = giro em graus, s = segmentos, w = carga na mão, f = junta filha  */
+const P = {
+  banco:    '<rect class="eq" x="8" y="40" width="46" height="5" rx="2"/><line class="eq" x1="14" y1="45" x2="14" y2="57"/><line class="eq" x1="48" y1="45" x2="48" y2="57"/>',
+  inclinado:'<path class="eq" d="M12 52 H32 L50 30"/><line class="eq" x1="18" y1="52" x2="18" y2="57"/><line class="eq" x1="46" y1="42" x2="46" y2="57"/>',
+  torreDir: '<line class="eq" x1="56" y1="5" x2="56" y2="57"/><circle class="eq" cx="53" cy="10" r="3"/>',
+  torreEsq: '<line class="eq" x1="8" y1="5" x2="8" y2="57"/><circle class="eq" cx="11" cy="10" r="3"/>',
+  chao:     '<line class="eq2" x1="4" y1="57" x2="60" y2="57"/>'
+};
+const halter = (x,y)=>`<line class="eq" x1="${x-5}" y1="${y}" x2="${x+5}" y2="${y}" stroke-width="5"/>`;
+const halterV = (x,y)=>`<line class="eq" x1="${x}" y1="${y-4}" x2="${x}" y2="${y+4}" stroke-width="5"/>`;
+const pegador = (x,y)=>`<circle class="eq" cx="${x}" cy="${y}" r="3"/>`;
+const corda = (x,y)=>`<path class="eq" d="M${x} ${y} l-3 6 M${x} ${y} l3 6"/>`;
+const barra = (x,y,l)=>`<line class="eq" x1="${x-l}" y1="${y}" x2="${x+l}" y2="${y}" stroke-width="4"/>`;
+const anilhas = (x,y,l)=>`<line class="eq" x1="${x-l}" y1="${y}" x2="${x+l}" y2="${y}" stroke-width="3"/><circle class="eq" cx="${x-l}" cy="${y}" r="5"/><circle class="eq" cx="${x+l}" cy="${y}" r="5"/>`;
+
+const ICO = {
+/* ================= EMPURRAR ================= */
+a1:{ // supino reto com halteres — ombro abre, cotovelo estende
+  eq:P.banco,
+  corpo:'<circle class="b" cx="16" cy="35" r="4"/><line class="b" x1="20" y1="38" x2="40" y2="38"/><path class="b" d="M40 38 L47 33 L50 40"/>',
+  ch:[{p:[26,38], r:35, s:[[26,38,19,31]], f:{p:[19,31], r:-70, s:[[19,31,27,26]], w:halter(27,26)}}]},
+
+a2:{ // supino inclinado na máquina
+  eq:P.inclinado,
+  corpo:'<circle class="b" cx="46" cy="25" r="4"/><line class="b" x1="44" y1="30" x2="33" y2="49"/><path class="b" d="M33 49 L20 51 L16 56"/>',
+  ch:[{p:[41,34], r:30, s:[[41,34,33,39]], f:{p:[33,39], r:60, s:[[33,39,26,31]], w:pegador(26,31)}}]},
+
+a3:{ // peck deck — vista de frente, braços fecham
+  eq:'<rect class="eq" x="26" y="20" width="12" height="30" rx="4"/>',
+  corpo:'<circle class="b" cx="32" cy="13" r="5"/>',
+  ch:[{p:[27,24], r:28, s:[[27,24,13,20]], w:pegador(13,20)},
+      {p:[37,24], r:-28, s:[[37,24,51,20]], w:pegador(51,20)}]},
+
+a4:{ // desenvolvimento sentado com halteres
+  eq:'<path class="eq" d="M18 46 H40 M40 46 V22"/><line class="eq" x1="22" y1="46" x2="22" y2="56"/>',
+  corpo:'<circle class="b" cx="36" cy="21" r="4"/><line class="b" x1="36" y1="26" x2="36" y2="41"/><path class="b" d="M36 41 L22 44 L20 53"/>',
+  ch:[{p:[34,29], r:48, s:[[34,29,26,33]], f:{p:[26,33], r:-28, s:[[26,33,25,23]], w:halter(25,23)}}]},
+
+a5:{ // elevação lateral na polia — braço sobe inteiro
+  eq:'<line class="eq" x1="48" y1="44" x2="48" y2="57"/><circle class="eq" cx="46" cy="47" r="3"/>',
+  corpo:'<circle class="b" cx="22" cy="14" r="5"/><line class="b" x1="22" y1="19" x2="22" y2="38"/><path class="b" d="M22 38 L16 56 M22 38 L28 56"/>',
+  ch:[{p:[22,24], r:-38, s:[[22,24,36,32]], w:pegador(36,32)+'<line class="eq2" x1="36" y1="32" x2="44" y2="46"/>'}]},
+
+a6:{ // tríceps na polia — cotovelo estende para baixo
+  eq:P.torreDir+'<line class="eq2" x1="53" y1="13" x2="42" y2="24"/>',
+  corpo:'<circle class="b" cx="24" cy="16" r="5"/><line class="b" x1="24" y1="21" x2="24" y2="40"/><path class="b" d="M24 40 L18 56 M24 40 L30 56"/><line class="b" x1="24" y1="26" x2="28" y2="34"/>',
+  ch:[{p:[28,34], r:32, s:[[28,34,40,27]], w:corda(40,27)}]},
+
+a7:{ // tríceps testa — cotovelo estende, barra sai de trás da testa
+  eq:P.banco,
+  corpo:'<circle class="b" cx="18" cy="35" r="4"/><line class="b" x1="22" y1="38" x2="40" y2="38"/><path class="b" d="M40 38 L47 33 L50 40"/><line class="b" x1="28" y1="37" x2="28" y2="25"/>',
+  ch:[{p:[28,25], r:50, s:[[28,25,19,21]], w:'<path class="eq" d="M11 19 h4 l3 3 h3 l3 -3 h4"/>'}]},
+
+/* ================= PUXAR ================= */
+b1:{ // puxada frente — braço desce, cotovelo dobra, barra acompanha
+  eq:'<line class="eq" x1="52" y1="4" x2="52" y2="56"/><circle class="eq" cx="48" cy="8" r="3"/><rect class="eq" x="20" y="45" width="18" height="4" rx="2"/>',
+  corpo:'<circle class="b" cx="30" cy="27" r="4.5"/><line class="b" x1="30" y1="32" x2="30" y2="44"/><path class="b" d="M30 44 L41 46 L43 55"/>',
+  ch:[{p:[30,34], r:-45, s:[[30,34,26,22]], f:{p:[26,22], r:60, s:[[26,22,32,14]], w:barra(32,14,14)+'<line class="eq2" x1="32" y1="14" x2="48" y2="10"/>'}}]},
+
+b2:{ // remada baixa — cotovelo puxa para trás
+  eq:'<rect class="eq" x="6" y="44" width="28" height="4" rx="2"/><line class="eq" x1="52" y1="26" x2="52" y2="57"/><circle class="eq" cx="50" cy="48" r="3"/><line class="eq" x1="44" y1="38" x2="44" y2="50"/>',
+  corpo:'<circle class="b" cx="16" cy="27" r="4.5"/><line class="b" x1="17" y1="32" x2="19" y2="44"/><path class="b" d="M19 44 L38 47 L44 42"/>',
+  ch:[{p:[18,35], r:26, s:[[18,35,30,39]], f:{p:[30,39], r:-62, s:[[30,39,40,41]], w:pegador(40,41)+'<line class="eq2" x1="40" y1="41" x2="49" y2="46"/>'}}]},
+
+b3:{ // remada articulada unilateral
+  eq:'<rect class="eq" x="42" y="14" width="6" height="42" rx="2"/><rect class="eq" x="10" y="42" width="20" height="4" rx="2"/>',
+  corpo:'<circle class="b" cx="20" cy="20" r="4.5"/><line class="b" x1="20" y1="25" x2="20" y2="41"/><path class="b" d="M20 41 L32 44 L34 54"/>',
+  ch:[{p:[20,28], r:20, s:[[20,28,30,31]], f:{p:[30,31], r:-62, s:[[30,31,40,29]], w:pegador(40,29)+'<line class="eq" x1="40" y1="29" x2="45" y2="26"/>'}}]},
+
+b4:{ // pullover na polia — braço estendido gira no ombro
+  eq:P.torreEsq,
+  corpo:'<circle class="b" cx="42" cy="16" r="5"/><line class="b" x1="42" y1="21" x2="40" y2="40"/><path class="b" d="M40 40 L34 56 M40 40 L46 56"/>',
+  ch:[{p:[41,26], r:-38, s:[[41,26,26,20]], w:barra(26,20,6)+'<line class="eq2" x1="26" y1="20" x2="12" y2="12"/>'}]},
+
+b5:{ // rosca direta — antebraço sobe, barra na mão
+  eq:'',
+  corpo:'<circle class="b" cx="32" cy="12" r="5"/><line class="b" x1="32" y1="17" x2="32" y2="36"/><path class="b" d="M32 36 L26 56 M32 36 L38 56"/><line class="b" x1="32" y1="21" x2="30" y2="32"/>',
+  ch:[{p:[30,32], r:-150, s:[[30,32,32,44]], w:'<path class="eq" d="M22 44 h6 l3 -2 h4 l3 2 h6"/>'}]},
+
+b6:{ // rosca martelo — antebraço sobe com halter em pé
+  eq:'',
+  corpo:'<circle class="b" cx="32" cy="12" r="5"/><line class="b" x1="32" y1="17" x2="32" y2="38"/><path class="b" d="M32 38 L26 56 M32 38 L38 56"/><line class="b" x1="30" y1="21" x2="28" y2="32"/><line class="b" x1="34" y1="21" x2="36" y2="32"/>',
+  ch:[{p:[28,32], r:-165, s:[[28,32,28,43]], w:halterV(28,45)},
+      {p:[36,32], r:-165, s:[[36,32,36,43]], w:halterV(36,45)}]},
+
+b7:{ // face pull — cotovelo alto puxa até o rosto
+  eq:P.torreDir+'<line class="eq2" x1="53" y1="13" x2="44" y2="16"/>',
+  corpo:'<circle class="b" cx="20" cy="17" r="5"/><line class="b" x1="20" y1="22" x2="20" y2="40"/><path class="b" d="M20 40 L14 56 M20 40 L26 56"/>',
+  ch:[{p:[20,25], r:-12, s:[[20,25,32,20]], f:{p:[32,20], r:-28, s:[[32,20,44,18]], w:corda(44,18)}}]},
+
+/* ================= PERNAS ================= */
+c1:{ // agachamento no Smith — tornozelo, joelho e quadril
+  eq:'<line class="eq" x1="10" y1="4" x2="10" y2="57"/><line class="eq" x1="54" y1="4" x2="54" y2="57"/>',
+  corpo:'<line class="b" x1="28" y1="52" x2="40" y2="52"/>',
+  ch:[{p:[34,52], r:-22, s:[[34,52,30,34]], f:{p:[30,34], r:50, s:[[30,34,34,24]],
+      f:{p:[34,24], r:-30, s:[[34,24,32,14]], w:'<circle class="b" cx="31" cy="10" r="5"/>'+barra(32,17,22)}}}]},
+
+c2:{ // leg press 45 — quadril e joelho empurram a plataforma
+  eq:'<path class="eq" d="M4 46 H24 M4 46 L3 36"/><circle class="b" cx="8" cy="31" r="4.5"/><line class="b" x1="11" y1="35" x2="22" y2="43"/>',
+  corpo:'',
+  ch:[{p:[22,43], r:-32, s:[[22,43,34,32]], f:{p:[34,32], r:38, s:[[34,32,32,20]],
+      w:'<path class="eq" d="M22 10 L48 30" stroke-width="4"/><path class="eq" d="M24 41 H46"/>'}}]},
+
+c3:{ // cadeira extensora — canela sobe no joelho
+  eq:'<path class="eq" d="M14 44 H38 M38 44 V22"/><line class="eq" x1="18" y1="44" x2="18" y2="56"/>',
+  corpo:'<circle class="b" cx="34" cy="17" r="4.5"/><line class="b" x1="34" y1="22" x2="32" y2="42"/><line class="b" x1="32" y1="42" x2="44" y2="44"/>',
+  ch:[{p:[44,44], r:-58, s:[[44,44,46,56]], w:'<circle class="eq" cx="47" cy="57" r="4"/>'}]},
+
+c4:{ // cadeira flexora — canela desce no joelho
+  eq:'<path class="eq" d="M14 40 H36 M36 40 V18"/><line class="eq" x1="18" y1="40" x2="18" y2="56"/><rect class="eq" x="22" y="34" width="12" height="5" rx="2"/>',
+  corpo:'<circle class="b" cx="32" cy="13" r="4.5"/><line class="b" x1="32" y1="18" x2="31" y2="38"/><line class="b" x1="31" y1="38" x2="43" y2="40"/>',
+  ch:[{p:[43,40], r:52, s:[[43,40,52,32]], w:'<circle class="eq" cx="53" cy="31" r="4"/>'}]},
+
+c5:{ // panturrilha em pé — corpo inteiro sobe no tornozelo
+  eq:'<rect class="eq" x="20" y="50" width="26" height="5" rx="2"/>',
+  corpo:'',
+  ch:[{dx:0, dy:-4, s:[[38,50,30,36],[30,36,30,18]], w:'<circle class="b" cx="30" cy="13" r="5"/><line class="b" x1="24" y1="22" x2="24" y2="34"/>'+halterV(24,37)}]},
+
+c6:{ // abdominal na polia ajoelhado — tronco flexiona no quadril
+  eq:P.torreEsq+'<line class="eq2" x1="12" y1="13" x2="22" y2="18"/>',
+  corpo:'<path class="b" d="M42 44 L48 50 L38 53"/><line class="eq2" x1="30" y1="55" x2="52" y2="55"/>',
+  ch:[{p:[42,44], r:-34, s:[[42,44,36,26]], w:'<circle class="b" cx="35" cy="21" r="4.5"/><line class="b" x1="36" y1="26" x2="24" y2="19"/>'+corda(23,18)}]},
+
+/* ================= SUPERIOR 2 ================= */
+d1:{ // remada com halter apoiado no banco
+  eq:P.banco,
+  corpo:'<circle class="b" cx="16" cy="24" r="4.5"/><path class="b" d="M20 28 L40 34 L46 54"/><path class="b" d="M36 34 L33 41"/>',
+  ch:[{p:[25,31], r:-12, s:[[25,31,25,40]], f:{p:[25,40], r:-58, s:[[25,40,25,46]], w:halter(25,47)}}]},
+
+d2:{ // crucifixo inverso — vista de frente, braços abrem
+  eq:'<rect class="eq" x="26" y="22" width="12" height="28" rx="4"/>',
+  corpo:'<circle class="b" cx="32" cy="14" r="5"/>',
+  ch:[{p:[27,27], r:-26, s:[[27,27,17,34]], w:pegador(17,34)},
+      {p:[37,27], r:26, s:[[37,27,47,34]], w:pegador(47,34)}]},
+
+d3:{ // supino inclinado com halteres
+  eq:P.inclinado,
+  corpo:'<circle class="b" cx="46" cy="25" r="4"/><line class="b" x1="44" y1="30" x2="33" y2="49"/><path class="b" d="M33 49 L20 51 L16 56"/>',
+  ch:[{p:[41,33], r:32, s:[[41,33,34,38]], f:{p:[34,38], r:62, s:[[34,38,27,30]], w:halter(27,29)}}]},
+
+d4:{ // puxada supinada pegada fechada
+  eq:'<line class="eq" x1="52" y1="4" x2="52" y2="56"/><circle class="eq" cx="48" cy="8" r="3"/><rect class="eq" x="20" y="45" width="18" height="4" rx="2"/>',
+  corpo:'<circle class="b" cx="30" cy="28" r="4.5"/><line class="b" x1="30" y1="33" x2="30" y2="44"/><path class="b" d="M30 44 L41 46 L43 55"/>',
+  ch:[{p:[30,35], r:-50, s:[[30,35,29,23]], f:{p:[29,23], r:70, s:[[29,23,32,13]], w:barra(32,13,9)+'<line class="eq2" x1="32" y1="13" x2="48" y2="10"/>'}}]},
+
+d5:{ // elevação lateral na máquina — alavancas sobem
+  eq:'<rect class="eq" x="24" y="28" width="16" height="24" rx="4"/>',
+  corpo:'<circle class="b" cx="32" cy="17" r="5"/>',
+  ch:[{p:[26,31], r:30, s:[[26,31,13,29]], w:'<rect class="eq" x="5" y="26" width="9" height="5" rx="2"/>'},
+      {p:[38,31], r:-30, s:[[38,31,51,29]], w:'<rect class="eq" x="50" y="26" width="9" height="5" rx="2"/>'}]},
+
+d6:{ // rosca no banco scott — antebraço sobe apoiado
+  eq:'<path class="eq" d="M18 42 L44 26"/><line class="eq" x1="24" y1="40" x2="24" y2="56"/><rect class="eq" x="8" y="42" width="16" height="4" rx="2"/>',
+  corpo:'<circle class="b" cx="14" cy="22" r="4.5"/><line class="b" x1="15" y1="27" x2="16" y2="41"/><line class="b" x1="17" y1="30" x2="34" y2="30"/>',
+  ch:[{p:[34,30], r:-70, s:[[34,30,44,26]], w:barra(46,25,7)}]},
+
+d7:{ // tríceps unilateral na polia
+  eq:P.torreDir+'<line class="eq2" x1="53" y1="13" x2="44" y2="24"/>',
+  corpo:'<circle class="b" cx="24" cy="16" r="5"/><line class="b" x1="24" y1="21" x2="24" y2="40"/><path class="b" d="M24 40 L18 56 M24 40 L30 56"/><line class="b" x1="24" y1="26" x2="29" y2="33"/>',
+  ch:[{p:[29,33], r:30, s:[[29,33,41,27]], w:pegador(42,27)}]},
+
+/* ================= POSTERIOR ================= */
+e1:{ // stiff — dobra no quadril, barra desce junto
+  eq:'',
+  corpo:'<line class="b" x1="36" y1="34" x2="36" y2="54"/><line class="b" x1="31" y1="54" x2="41" y2="54"/>',
+  ch:[{p:[36,34], r:-46, s:[[36,34,32,18]], w:'<circle class="b" cx="31" cy="13" r="5"/><line class="b" x1="33" y1="21" x2="26" y2="33"/>'+anilhas(25,35,11)}]},
+
+e2:{ // elevação pélvica — quadril sobe, barra em cima
+  eq:'<rect class="eq" x="6" y="30" width="20" height="5" rx="2"/><line class="eq" x1="10" y1="35" x2="10" y2="52"/>',
+  corpo:'<circle class="b" cx="10" cy="24" r="4.5"/><path class="b" d="M40 47 L41 55"/>',
+  ch:[{p:[15,30], r:-16, s:[[15,30,36,40]], f:{p:[36,40], r:22, s:[[36,40,40,47]], w:anilhas(34,37,10)}}]},
+
+e3:{ // mesa flexora — canela sobe no joelho, deitado de bruços
+  eq:'<rect class="eq" x="8" y="36" width="42" height="5" rx="2"/><line class="eq" x1="14" y1="41" x2="14" y2="56"/><line class="eq" x1="44" y1="41" x2="44" y2="56"/>',
+  corpo:'<circle class="b" cx="12" cy="30" r="4"/><line class="b" x1="16" y1="33" x2="40" y2="33"/>',
+  ch:[{p:[40,33], r:-62, s:[[40,33,50,36]], w:'<circle class="eq" cx="52" cy="37" r="4"/>'}]},
+
+e4:{ // leg press pés altos — mesma mecânica, pé no alto
+  eq:'<path class="eq" d="M4 46 H24 M4 46 L3 36"/><circle class="b" cx="8" cy="31" r="4.5"/><line class="b" x1="11" y1="35" x2="22" y2="43"/>',
+  corpo:'',
+  ch:[{p:[22,43], r:-30, s:[[22,43,33,30]], f:{p:[33,30], r:36, s:[[33,30,30,19]],
+      w:'<path class="eq" d="M20 8 L46 28" stroke-width="4"/><path class="eq" d="M22 39 H44"/><line class="mv" x1="22" y1="10" x2="30" y2="16" stroke-width="4"/>'}}]},
+
+e5:{ // cadeira abdutora — pernas abrem, vista de frente
+  eq:'<rect class="eq" x="26" y="26" width="12" height="16" rx="3"/>',
+  corpo:'<circle class="b" cx="32" cy="16" r="5"/><line class="b" x1="32" y1="21" x2="32" y2="26"/>',
+  ch:[{p:[29,40], r:-22, s:[[29,40,22,53]], w:'<rect class="eq" x="14" y="49" width="9" height="5" rx="2"/>'},
+      {p:[35,40], r:22, s:[[35,40,42,53]], w:'<rect class="eq" x="41" y="49" width="9" height="5" rx="2"/>'}]},
+
+e6:{ // panturrilha sentado — calcanhar sobe no tornozelo
+  eq:'<path class="eq" d="M10 40 H30 M30 40 V20"/><line class="eq" x1="28" y1="40" x2="28" y2="55"/>',
+  corpo:'<circle class="b" cx="26" cy="15" r="4.5"/><line class="b" x1="26" y1="20" x2="26" y2="38"/><line class="b" x1="26" y1="38" x2="14" y2="40"/><line class="b" x1="14" y1="40" x2="14" y2="52"/>',
+  ch:[{p:[6,50], r:-28, s:[[6,50,14,52],[14,52,14,40]], w:''},
+      {dx:0, dy:-4, s:[], w:'<rect class="eq" x="12" y="32" width="12" height="5" rx="2"/>'}]},
+
+e7:{ // abdominal na máquina — tronco flexiona no quadril
+  eq:'<rect class="eq" x="42" y="14" width="6" height="42" rx="2"/><rect class="eq" x="16" y="44" width="20" height="4" rx="2"/>',
+  corpo:'<path class="b" d="M30 42 L18 46"/>',
+  ch:[{p:[30,42], r:28, s:[[30,42,27,25]], w:'<circle class="b" cx="26" cy="20" r="4.5"/><line class="b" x1="27" y1="26" x2="37" y2="17"/><line class="eq" x1="37" y1="17" x2="45" y2="20"/>'}]}
+};
+
+function cadeia(c){
+  const segs = (c.s||[]).map(([x1,y1,x2,y2])=>`<line class="b" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>`).join('');
+  const dentro = segs + (c.w||'') + (c.f ? cadeia(c.f) : '');
+  const est = c.p ? `transform-box:view-box;transform-origin:${c.p[0]}px ${c.p[1]}px;--r:${c.r}deg`
+                  : `--dx:${c.dx}px;--dy:${c.dy}px`;
+  return `<g class="an" style="${est}">${dentro}</g>`;
+}
+function desenho(id){
+  const I = ICO[id];
+  if(!I) return '';
+  return I.eq + I.corpo + I.ch.map(cadeia).join('');
+}
+
+const ALT = {
+  a1:'supino reto na máquina ou supino no Smith',
+  a2:'supino inclinado com halteres ou crucifixo inclinado',
+  a3:'crucifixo na polia (cross over) ou crucifixo com halteres',
+  a4:'desenvolvimento na máquina ou desenvolvimento no Smith',
+  a5:'elevação lateral com halteres ou na máquina',
+  a6:'tríceps na polia com barra reta ou mergulho no banco',
+  a7:'tríceps francês com halter',
+  b1:'puxada na máquina articulada ou graviton',
+  b2:'remada na máquina sentada ou remada com barra',
+  b3:'remada cavalinho ou remada baixa com pegada neutra',
+  b4:'pullover com halter no banco',
+  b5:'rosca direta na polia baixa ou com halteres',
+  b6:'rosca martelo na polia com corda',
+  b7:'crucifixo inverso na máquina',
+  c1:'agachamento livre, hack machine ou agachamento no leg press',
+  c2:'hack machine ou agachamento búlgaro com halteres',
+  c3:'agachamento no Smith com pés à frente',
+  c4:'mesa flexora deitado ou stiff com halteres',
+  c5:'panturrilha no leg press ou no step com halter',
+  c6:'abdominal na máquina ou prancha isométrica',
+  d1:'remada baixa unilateral na polia',
+  d2:'crucifixo inverso na polia cruzada ou peck deck invertido',
+  d3:'supino inclinado na máquina ou cross over de baixo pra cima',
+  d4:'remada baixa pegada supinada ou rosca na barra fixa assistida',
+  d5:'elevação lateral com halteres sentado',
+  d6:'rosca concentrada ou rosca na polia baixa',
+  d7:'tríceps testa com halteres',
+  e1:'stiff na máquina Smith ou levantamento terra romeno com halteres',
+  e2:'elevação pélvica na máquina de glúteo ou coice na polia',
+  e3:'flexora sentada ou stiff unilateral',
+  e4:'agachamento sumô com halter ou avanço com halteres',
+  e5:'coice na polia ou glúteo na máquina',
+  e6:'panturrilha no leg press com joelho dobrado',
+  e7:'abdominal na polia ajoelhado ou prancha'
+};
+
+/* ---- músculos por exercício: [alvo, auxiliares] ---- */
+const MUSC = {
+  a1:[['peito'],['triceps','ombro']],      a2:[['peito'],['ombro','triceps']],
+  a3:[['peito'],['ombro']],                a4:[['ombro'],['triceps']],
+  a5:[['ombro'],[]],                       a6:[['triceps'],[]],
+  a7:[['triceps'],[]],
+  b1:[['dorsal'],['biceps','antebraco']],  b2:[['dorsal'],['biceps','trapezio']],
+  b3:[['dorsal'],['biceps','trapezio']],   b4:[['dorsal'],['peito']],
+  b5:[['biceps'],['antebraco']],           b6:[['biceps'],['antebraco']],
+  b7:[['ombroPost'],['trapezio']],
+  c1:[['quad'],['gluteo','lombar','abs']], c2:[['quad'],['gluteo']],
+  c3:[['quad'],[]],                        c4:[['posterior'],[]],
+  c5:[['panturrilha'],[]],                 c6:[['abs'],[]],
+  d1:[['dorsal'],['biceps','ombroPost']],  d2:[['ombroPost'],['trapezio']],
+  d3:[['peito'],['ombro','triceps']],      d4:[['dorsal'],['biceps']],
+  d5:[['ombro'],[]],                       d6:[['biceps'],[]],
+  d7:[['triceps'],[]],
+  e1:[['posterior'],['gluteo','lombar']],  e2:[['gluteo'],['posterior']],
+  e3:[['posterior'],['panturrilha']],      e4:[['gluteo'],['posterior','quad']],
+  e5:[['gluteo'],[]],                      e6:[['panturrilha'],[]],
+  e7:[['abs'],[]]
+};
+const NOMES = {peito:'peito',ombro:'ombro',ombroPost:'ombro posterior',triceps:'tríceps',
+  biceps:'bíceps',antebraco:'antebraço',dorsal:'dorsal',trapezio:'trapézio',lombar:'lombar',
+  abs:'abdômen',gluteo:'glúteo',quad:'quadríceps',posterior:'posterior de coxa',panturrilha:'panturrilha'};
+
+function corpo(alvo, sec){
+  const c = g => 'm' + (alvo.includes(g) ? ' a' : (sec.includes(g) ? ' s' : ''));
+  return `<svg viewBox="0 0 104 100" role="img" aria-label="Músculo trabalhado: ${alvo.map(m=>NOMES[m]).join(', ')}">
+    <g>
+      <circle class="m" cx="24" cy="8" r="6.5"/>
+      <rect class="${c('trapezio')}" x="19" y="13" width="10" height="6" rx="2.5"/>
+      <circle class="${c('ombro')}" cx="11" cy="24" r="6"/><circle class="${c('ombro')}" cx="37" cy="24" r="6"/>
+      <rect class="${c('peito')}" x="13" y="20" width="22" height="12" rx="4"/>
+      <rect class="${c('abs')}" x="17" y="33" width="14" height="17" rx="4"/>
+      <rect class="${c('biceps')}" x="4" y="30" width="7" height="15" rx="3.5"/>
+      <rect class="${c('biceps')}" x="37" y="30" width="7" height="15" rx="3.5"/>
+      <rect class="${c('antebraco')}" x="3.5" y="45" width="6" height="15" rx="3"/>
+      <rect class="${c('antebraco')}" x="38.5" y="45" width="6" height="15" rx="3"/>
+      <rect class="m" x="15" y="50" width="18" height="6" rx="3"/>
+      <rect class="${c('quad')}" x="14" y="55" width="8" height="22" rx="4"/>
+      <rect class="${c('quad')}" x="26" y="55" width="8" height="22" rx="4"/>
+      <rect class="${c('panturrilha')}" x="15" y="78" width="6.5" height="17" rx="3"/>
+      <rect class="${c('panturrilha')}" x="26.5" y="78" width="6.5" height="17" rx="3"/>
+    </g>
+    <g transform="translate(56,0)">
+      <circle class="m" cx="24" cy="8" r="6.5"/>
+      <path class="${c('trapezio')}" d="M16 14 H32 L37 27 H11 Z"/>
+      <circle class="${c('ombroPost')}" cx="11" cy="24" r="6"/><circle class="${c('ombroPost')}" cx="37" cy="24" r="6"/>
+      <path class="${c('dorsal')}" d="M11 28 H37 L31 46 H17 Z"/>
+      <rect class="${c('lombar')}" x="18" y="45" width="12" height="7" rx="3"/>
+      <rect class="${c('triceps')}" x="4" y="30" width="7" height="15" rx="3.5"/>
+      <rect class="${c('triceps')}" x="37" y="30" width="7" height="15" rx="3.5"/>
+      <rect class="${c('antebraco')}" x="3.5" y="45" width="6" height="15" rx="3"/>
+      <rect class="${c('antebraco')}" x="38.5" y="45" width="6" height="15" rx="3"/>
+      <rect class="${c('gluteo')}" x="13" y="51" width="22" height="10" rx="5"/>
+      <rect class="${c('posterior')}" x="14" y="60" width="8" height="18" rx="4"/>
+      <rect class="${c('posterior')}" x="26" y="60" width="8" height="18" rx="4"/>
+      <rect class="${c('panturrilha')}" x="15" y="78" width="6.5" height="17" rx="3"/>
+      <rect class="${c('panturrilha')}" x="26.5" y="78" width="6.5" height="17" rx="3"/>
+    </g>
+  </svg>`;
+}
+
+/* ---- exercícios extras: academia de prédio (halteres + banco) ---- */
+Object.assign(EX, {
+  p1:{nome:'Agachamento goblet', maq:'Um halter segurado no peito', dica:'Halter colado no peito, cotovelo pra baixo. Desce entre os joelhos até a coxa passar da paralela.'},
+  p3:{nome:'Stiff com halteres', maq:'Dois halteres', dica:'Joelho quase travado, halteres rente à perna. Desce até puxar atrás da coxa, sem arredondar a lombar.'},
+  p4:{nome:'Elevação lateral com halteres', maq:'Halteres, em pé', dica:'Sobe até a linha do ombro e desce em 2 s. Carga leve: aqui quem balança não treina ombro.'},
+  p5:{nome:'Panturrilha em pé com halter', maq:'Halter na mão, pé num degrau ou anilha', dica:'Calcanhar bem abaixo do degrau, pausa de 2 s lá embaixo.'},
+  p6:{nome:'Abdominal no chão', maq:'Colchonete', dica:'Sobe encurtando a distância entre esterno e quadril. Mão no peito, sem puxar a nuca.'},
+  p7:{nome:'Tríceps francês com halter', maq:'Um halter, duas mãos, sentado ou em pé', dica:'Cotovelo apontado pro teto e parado. Desce o halter atrás da cabeça até alongar bem.'}
+});
+
+Object.assign(ALT, {
+  p1:'afundo com halteres, agachamento búlgaro com o pé no banco ou leg press',
+  p3:'stiff na polia baixa, terra romeno com um halter só ou elevação pélvica com halter no quadril',
+  p4:'elevação lateral na polia baixa ou inclinado no banco',
+  p5:'panturrilha unilateral sem peso, com mais repetições',
+  p6:'prancha isométrica de 40 s ou elevação de pernas deitado',
+  p7:'tríceps na polia com corda ou mergulho no banco'
+});
+
+Object.assign(MUSC, {
+  p1:[['quad'],['gluteo','abs','lombar']],
+  p3:[['posterior'],['gluteo','lombar']],
+  p4:[['ombro'],[]],
+  p5:[['panturrilha'],[]],
+  p6:[['abs'],[]],
+  p7:[['triceps'],[]]
+});
+
+Object.assign(ICO, {
+  p1:{ // agachamento goblet
+    eq:'',
+    corpo:'<line class="b" x1="28" y1="54" x2="40" y2="54"/>',
+    ch:[{p:[34,54], r:-22, s:[[34,54,30,36]], f:{p:[30,36], r:50, s:[[30,36,34,26]],
+        f:{p:[34,26], r:-30, s:[[34,26,32,16]],
+           w:'<circle class="b" cx="31" cy="11" r="5"/><line class="b" x1="33" y1="20" x2="27" y2="22"/>'+halterV(25,23)}}}]},
+
+  p3:{ // stiff com halteres
+    eq:'',
+    corpo:'<line class="b" x1="36" y1="34" x2="36" y2="54"/><line class="b" x1="31" y1="54" x2="41" y2="54"/>',
+    ch:[{p:[36,34], r:-46, s:[[36,34,32,18]],
+        w:'<circle class="b" cx="31" cy="13" r="5"/><line class="b" x1="33" y1="21" x2="27" y2="33"/>'+halterV(26,35)}]},
+
+  p4:{ // elevação lateral com halteres
+    eq:'',
+    corpo:'<circle class="b" cx="24" cy="14" r="5"/><line class="b" x1="24" y1="19" x2="24" y2="38"/><path class="b" d="M24 38 L18 56 M24 38 L30 56"/>',
+    ch:[{p:[24,24], r:-38, s:[[24,24,38,32]], w:halterV(39,33)}]},
+
+  p5:{ // panturrilha em pé com halter
+    eq:'<rect class="eq" x="20" y="50" width="26" height="5" rx="2"/>',
+    corpo:'',
+    ch:[{dx:0, dy:-4, s:[[38,50,30,36],[30,36,30,18]],
+        w:'<circle class="b" cx="30" cy="13" r="5"/><line class="b" x1="24" y1="22" x2="24" y2="34"/>'+halterV(24,37)}]},
+
+  p6:{ // abdominal no chão
+    eq:'<line class="eq2" x1="6" y1="52" x2="58" y2="52"/>',
+    corpo:'<path class="b" d="M34 50 L44 40 L50 50"/>',
+    ch:[{p:[34,50], r:40, s:[[34,50,18,46]],
+        w:'<circle class="b" cx="14" cy="44" r="4.5"/><line class="b" x1="20" y1="44" x2="26" y2="40"/>'}]},
+
+  p7:{ // tríceps francês
+    eq:'',
+    corpo:'<circle class="b" cx="23" cy="15" r="5"/><line class="b" x1="23" y1="20" x2="23" y2="38"/><path class="b" d="M23 38 L17 56 M23 38 L29 56"/><line class="b" x1="24" y1="24" x2="28" y2="18"/>',
+    ch:[{p:[28,18], r:140, s:[[28,18,22,26]], w:halterV(21,28)}]}
+});
+
+/* ---- modo extra: academia do prédio ---- */
+NIVEIS.predio = {
+  nome:'Academia do prédio', curto:'EXTRA', sub:'sessão avulsa de fim de semana',
+  plano:'2 sessões de corpo inteiro · halteres, polia, leg press e banco',
+  deload:0,
+  regras:`<p><b>Isto não é um programa, é um complemento.</b> Use no sábado, no domingo ou no dia atropelado em que não dá pra ir na academia grande. Seu programa continua sendo o nível que você escolheu.</p>
+    <p><b>Duas sessões que se revezam.</b> Se treinar dois dias seguidos aí, faça P1 num e P2 no outro: a primeira puxa mais empurrar e quadríceps, a segunda mais puxar e posterior. Se for um dia só na semana, alterne qual você faz.</p>
+    <p><b>Corpo inteiro de novo</b>, porque quando a frequência é imprevisível, cobrir tudo numa sessão rende mais do que dividir e deixar metade sem treinar.</p>
+    <p><b>Halter leve demais? Some repetição, não série.</b> Com carga limitada o caminho é ir pra 15–25 repetições e terminar perto da falha: a literatura mostra crescimento equivalente de 5 a 30 reps quando a série acaba perto do limite.</p>
+    <p><b>O histórico daqui é separado</b> do programa principal, então a carga do leg press daí não se mistura com a da Bluefit — que costuma ser máquina diferente e escala diferente.</p>
+    <p><b>Se isso virar seu lugar principal</b> por algumas semanas, me avise: aí vale reorganizar em 3 ou 4 dias de verdade em vez de sessão avulsa.</p>`,
+  dias:[
+    {id:'P1', letra:'P1', nome:'Corpo inteiro A', foco:'Quadríceps · Peito · Costas · Ombro', ex:[
+      {id:'c2', s:3, reps:'10–15', rir:'1–2', desc:150},
+      {id:'a1', s:3, reps:'8–12', rir:'2', desc:150},
+      {id:'b1', s:3, reps:'8–12', rir:'2', desc:150},
+      {id:'a5', s:3, reps:'12–20', rir:'0–1', desc:60},
+      {id:'a6', s:3, reps:'10–15', rir:'1', desc:75},
+      {id:'b6', s:2, reps:'10–15', rir:'1', desc:60},
+      {id:'p5', s:3, reps:'12–20', rir:'0–1', desc:60},
+      {id:'p1', s:3, reps:'8–12', rir:'2', desc:150, opt:true, nota:'Opcional: só faça se o leg press estiver ocupado ou se quiser mais perna.'}
+    ]},
+    {id:'P2', letra:'P2', nome:'Corpo inteiro B', foco:'Posterior · Costas · Peito · Braço', ex:[
+      {id:'p3', s:4, reps:'8–12', rir:'2', desc:150},
+      {id:'d1', s:3, reps:'10–12', rir:'1–2', desc:120},
+      {id:'d3', s:3, reps:'8–12', rir:'1–2', desc:120},
+      {id:'b4', s:3, reps:'12–15', rir:'0–1', desc:75},
+      {id:'e4', s:3, reps:'12–15', rir:'1', desc:120},
+      {id:'p4', s:3, reps:'12–20', rir:'0–1', desc:60},
+      {id:'p7', s:2, reps:'10–15', rir:'1', desc:60},
+      {id:'c6', s:2, reps:'12–15', rir:'1', desc:60, opt:true}
+    ]}
+  ]
+};
+
+const CHAVE = 'treino-bluefit-v1';
+let estado = { nivel:'int', atual:null, aba:'agenda', aberto:null, mes:null, reg:{}, ses:{}, inicio:null };
+let salvando=null, folhaAberta=null;
+
+/* ---------- armazenamento ---------- */
+let ondeSalva='verificando';
+const memoria={};
+const disco={
+  async ler(c){
+    if(window.storage){ try{ const r=await window.storage.get(c); if(r&&r.value){ondeSalva='app';return r;} }catch(e){} }
+    try{ const v=localStorage.getItem(c); if(v!==null){ondeSalva='navegador';return {value:v};} }catch(e){}
+    if(memoria[c]) return {value:memoria[c]};
+    await this.gravar(c,'{}');
+    return null;
+  },
+  async gravar(c,v){
+    memoria[c]=v; let ok=false;
+    if(window.storage){ try{ await window.storage.set(c,v); ok=true; ondeSalva='app'; }catch(e){} }
+    if(!ok){ try{ localStorage.setItem(c,v); ok=true; ondeSalva='navegador'; }catch(e){} }
+    if(!ok) ondeSalva='só nesta sessão';
+    return ok;
+  }
+};
+function salvar(){
+  clearTimeout(salvando);
+  salvando=setTimeout(async()=>{ try{ await disco.gravar(CHAVE, JSON.stringify(estado)); }catch(e){} },350);
+}
+async function carregar(){
+  try{ const r=await disco.ler(CHAVE); if(r&&r.value) estado=Object.assign(estado, JSON.parse(r.value)); }catch(e){}
+  migrar();
+  if(!estado.inicio) estado.inicio=hoje();
+  const abertaHoje = sessoesDe(hoje()).find(s=>!s.fim);
+  if(abertaHoje){ estado.atual=abertaHoje.id; estado.aba='treino'; }
+  else if(!estado.atual) estado.aba='agenda';
+  estado.mes = estado.mes || hoje().slice(0,7);
+  render();
+}
+
+/* migra o formato antigo (nivel|semana|dia|ex|serie) para sessões com data */
+function migrar(){
+  const antigas=Object.keys(estado.reg).filter(c=>c.split('|').length===5);
+  if(!antigas.length) return;
+  const grupos={};
+  antigas.forEach(c=>{
+    const [nivel,semana,dia,ex,i]=c.split('|');
+    (grupos[`${nivel}|${semana}|${dia}`]=grupos[`${nivel}|${semana}|${dia}`]||[]).push({c,ex,i});
+  });
+  const maxSem=Math.max(...Object.keys(grupos).map(g=>+g.split('|')[1]));
+  Object.entries(grupos).forEach(([g,itens])=>{
+    const [nivel,semana,dia]=g.split('|');
+    const d=new Date(); d.setDate(d.getDate()-(maxSem-(+semana))*7);
+    const data=iso(d);
+    const id=novoId(data);
+    const fimAntigo=(estado.fim||{})[`${nivel}|${semana}|${dia}`];
+    estado.ses[id]={id, data, nivel, dia, ts:d.getTime(), fim: fimAntigo? fimAntigo.ts : null, migrada:true};
+    itens.forEach(({c,ex,i})=>{ estado.reg[`${id}|${ex}|${i}`]=estado.reg[c]; delete estado.reg[c]; });
+  });
+  delete estado.fim;
+  const ultima=Object.values(estado.ses).sort((a,b)=>b.ts-a.ts)[0];
+  if(ultima && !ultima.fim) estado.atual=ultima.id;
+  salvar();
+}
+
+/* ---------- datas ---------- */
+const iso = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+const hoje = () => iso(new Date());
+const doIso = s => { const [a,m,d]=s.split('-').map(Number); return new Date(a,m-1,d); };
+const DIAS_SEM=['dom','seg','ter','qua','qui','sex','sáb'];
+const MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+function rotulo(data){
+  const d=doIso(data), h=hoje();
+  if(data===h) return 'hoje';
+  const ontem=new Date(); ontem.setDate(ontem.getDate()-1);
+  if(data===iso(ontem)) return 'ontem';
+  return `${DIAS_SEM[d.getDay()]}, ${d.getDate()} ${MESES[d.getMonth()].slice(0,3)}`;
+}
+function semanaDe(data){
+  const ini=doIso(estado.inicio||hoje()), d=doIso(data);
+  return Math.floor((d-ini)/(7*864e5))+1;
+}
+
+/* ---------- sessões ---------- */
+const sessoes = ()=> Object.values(estado.ses).sort((a,b)=> a.data===b.data ? a.ts-b.ts : (a.data<b.data?-1:1));
+const sessoesDe = data => sessoes().filter(s=>s.data===data);
+function novoId(data){ let n=1; while(estado.ses[`${data}#${n}`]) n++; return `${data}#${n}`; }
+function criarSessao(data, nivel, dia){
+  const id=novoId(data);
+  estado.ses[id]={id, data, nivel, dia, ts:Date.now(), fim:null};
+  estado.atual=id; estado.nivel=nivel; estado.aberto=null; estado.aba='treino';
+  salvar(); return id;
+}
+const atual = ()=> estado.ses[estado.atual] || null;
+function diasDe(nivel){ return NIVEIS[nivel].dias; }
+function sessaoDia(s){ return diasDe(s.nivel).find(d=>d.id===s.dia) || diasDe(s.nivel)[0]; }
+function proximoDia(nivel){
+  const ult=sessoes().filter(s=>s.nivel===nivel).pop();
+  const lista=diasDe(nivel);
+  if(!ult) return lista[0];
+  const i=lista.findIndex(d=>d.id===ult.dia);
+  return lista[(i+1)%lista.length];
+}
+function ultimaVez(nivel, dia, exceto){
+  return sessoes().filter(s=>s.nivel===nivel && s.dia===dia && s.id!==exceto).pop() || null;
+}
+
+/* ---------- registros ---------- */
+const k = (sesId,ex,i)=> `${sesId}|${ex}|${i}`;
+const pega = (sesId,ex,i)=> estado.reg[k(sesId,ex,i)] || {kg:'',reps:'',ok:false};
+const linha = p => Object.assign({}, EX[p.id], p);
+function contaSessao(s){
+  const dia=sessaoDia(s); let tot=0, ok=0;
+  dia.ex.forEach(p=>{ for(let i=0;i<p.s;i++){ tot++; if(pega(s.id,p.id,i).ok) ok++; } });
+  return {tot, ok};
+}
+function exFeito(p){ const s=atual(); let n=0; for(let i=0;i<p.s;i++) if(pega(s.id,p.id,i).ok) n++; return n; }
+function melhorMarca(exId, ignorar){
+  let max=0;
+  for(const c in estado.reg){
+    if(c.indexOf('|'+exId+'|')===-1 || c===ignorar) continue;
+    const r=estado.reg[c];
+    if(r.ok && parseFloat(r.kg)>max) max=parseFloat(r.kg);
+  }
+  return max;
+}
+function sugestao(exId, i, campo){
+  const s=atual();
+  for(let j=i-1;j>=0;j--){ const r=pega(s.id,exId,j); if(r[campo]) return r[campo]; }
+  let ref=ultimaVez(s.nivel, s.dia, s.id);
+  while(ref){
+    const r=pega(ref.id,exId,i); if(r[campo]) return r[campo];
+    for(let j=8;j>=0;j--){ const r2=pega(ref.id,exId,j); if(r2.ok&&r2[campo]) return r2[campo]; }
+    ref=ultimaVez(s.nivel, s.dia, ref.id)===ref? null : (sessoes().filter(x=>x.nivel===s.nivel&&x.dia===s.dia&&x.ts<ref.ts).pop()||null);
+  }
+  return '';
+}
+function passoDe(v){ return v<30 ? 2.5 : v<100 ? 5 : 10; }
+function resumo(s){
+  const dia=sessaoDia(s); let feitas=0,total=0,carga=0,prs=0,faltou=[];
+  dia.ex.forEach(p=>{
+    let ok=0;
+    for(let i=0;i<p.s;i++){ const r=pega(s.id,p.id,i); total++;
+      if(r.ok){feitas++;ok++;carga+=(parseFloat(r.kg)||0)*(parseFloat(r.reps)||0); if(r.pr) prs++;} }
+    if(ok<p.s && !p.opt) faltou.push(EX[p.id].nome+(ok?` (${ok}/${p.s})`:''));
+  });
+  return {feitas,total,carga:Math.round(carga),prs,faltou};
+}
+
+/* ---------- render ---------- */
+function render(){
+  const s=atual();
+  const cab=document.getElementById('cabecalho');
+  if(estado.aba==='treino' && s){
+    const dia=sessaoDia(s), n=sessoesDe(s.data).findIndex(x=>x.id===s.id)+1, q=contaSessao(s);
+    cab.innerHTML=`<div>
+        <span class="tag">${NIVEIS[s.nivel].curto}</span>
+        <h1>${dia.nome}</h1>
+        <p>${dia.foco}</p>
+      </div>
+      <button class="sem" id="irAgenda">
+        <b class="num">${doIso(s.data).getDate()}</b>
+        <small>${rotulo(s.data).toUpperCase()}${sessoesDe(s.data).length>1?' · '+n+'ª':''}</small>
+      </button>`;
+    document.getElementById('irAgenda').onclick=()=>{ estado.aba='agenda'; render(); window.scrollTo({top:0}); };
+    document.getElementById('prog').style.display='flex';
+    document.getElementById('bar').style.width=(q.tot? q.ok/q.tot*100:0)+'%';
+    document.getElementById('progTxt').textContent=`${q.ok} de ${q.tot} séries`;
+  } else {
+    const titulos={agenda:['Agenda','toque num dia pra treinar'],volume:['Semana','resumo, volume e check-in'],ajustes:['Ajustes','nível, regras e backup'],treino:['Nenhum treino aberto','escolha um dia na agenda']};
+    const [t,sub]=titulos[estado.aba]||titulos.agenda;
+    cab.innerHTML=`<div><h1>${t}</h1><p>${sub}</p></div>`;
+    document.getElementById('prog').style.display='none';
+  }
+  ({agenda:telaAgenda, treino:telaTreino, volume:telaSemana, ajustes:telaAjustes})[estado.aba]();
+  renderAbas();
+  if(!tInt) renderDock();
+}
+
+/* ---------- agenda ---------- */
+function telaAgenda(){
+  const mes=estado.mes||hoje().slice(0,7);
+  const [ano,m]=mes.split('-').map(Number);
+  const primeiro=new Date(ano,m-1,1), dias=new Date(ano,m,0).getDate();
+  const desloca=primeiro.getDay();
+  let celulas='';
+  for(let i=0;i<desloca;i++) celulas+='<div class="cel vazia"></div>';
+  for(let d=1;d<=dias;d++){
+    const data=`${ano}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const ss=sessoesDe(data);
+    const pontos=ss.map(x=>`<i class="${x.fim?'fim':'aberta'}"></i>`).join('');
+    celulas+=`<button class="cel${data===hoje()?' hoje':''}${ss.length?' tem':''}" data-data="${data}">
+      <b>${d}</b><div class="pts">${pontos}</div></button>`;
+  }
+  const prox=proximoDia(estado.nivel);
+  document.getElementById('tela').innerHTML=`
+    <div class="cal">
+      <div class="calTopo">
+        <button id="mesAnt" aria-label="mês anterior">‹</button>
+        <b>${MESES[m-1]} ${ano}</b>
+        <button id="mesProx" aria-label="próximo mês">›</button>
+      </div>
+      <div class="grade">${['D','S','T','Q','Q','S','S'].map(x=>`<span class="cabdia">${x}</span>`).join('')}${celulas}</div>
+      <p class="leg" style="margin-top:14px">Próximo da sequência: <b style="color:var(--ink)">${prox.letra} · ${prox.nome}</b> (${NIVEIS[estado.nivel].nome.toLowerCase()})</p>
+      ${sessoes().length? `<div class="hist"><h2>Últimos treinos</h2>${sessoes().slice(-6).reverse().map(s=>{
+        const q=contaSessao(s), dia=sessaoDia(s);
+        return `<button class="itemHist" data-abrir="${s.id}">
+          <b>${dia.letra}</b>
+          <div><span>${dia.nome}</span><small>${rotulo(s.data)} · ${q.ok}/${q.tot} séries${s.fim?' · encerrado':''}</small></div>
+          <i class="${s.fim?'fim':'aberta'}"></i></button>`;
+      }).join('')}</div>`:''}
+    </div>`;
+
+  document.getElementById('mesAnt').onclick=()=>{ const d=new Date(ano,m-2,1); estado.mes=iso(d).slice(0,7); render(); };
+  document.getElementById('mesProx').onclick=()=>{ const d=new Date(ano,m,1); estado.mes=iso(d).slice(0,7); render(); };
+  document.querySelectorAll('.cel[data-data]').forEach(b=> b.onclick=()=>abrirDia(b.dataset.data));
+  document.querySelectorAll('[data-abrir]').forEach(b=> b.onclick=()=>{
+    estado.atual=b.dataset.abrir; estado.nivel=estado.ses[estado.atual].nivel;
+    estado.aba='treino'; estado.aberto=null; salvar(); render(); window.scrollTo({top:0});
+  });
+}
+
+function abrirDia(data){
+  const ss=sessoesDe(data);
+  const futuro = doIso(data) > doIso(hoje());
+  let corpo='';
+  if(ss.length){
+    corpo+=`<p class="folhaSub">${ss.length===1?'Já tem um treino neste dia':'Já tem '+ss.length+' treinos neste dia'}</p>`;
+    corpo+=ss.map(s=>{
+      const q=contaSessao(s), dia=sessaoDia(s);
+      return `<button class="opt" data-abrir="${s.id}">
+        <div><b>${dia.letra} · ${dia.nome}</b><small>${q.ok}/${q.tot} séries${s.fim?' · encerrado':' · em aberto'}</small></div>
+        <span class="marca">›</span></button>`;
+    }).join('');
+    corpo+=`<p class="folhaSub" style="margin-top:14px">Treinar de novo neste dia</p>`;
+  } else if(futuro){
+    corpo+=`<p class="folhaSub">Dia futuro — dá pra deixar o treino já escolhido</p>`;
+  }
+  const prox=proximoDia(estado.nivel);
+  const listaNiveis=Object.keys(NIVEIS);
+  corpo+=listaNiveis.map(nv=> diasDe(nv).map(d=>{
+    const sugerido = nv===estado.nivel && d.id===prox.id && !ss.length;
+    return `<button class="opt${sugerido?' sel':''}" data-novo="${nv}|${d.id}|${data}">
+      <div><b>${d.letra} · ${d.nome}</b><small>${d.foco} · ${NIVEIS[nv].curto}</small></div>
+      ${sugerido?'<span class="marca">próximo</span>':''}</button>`;
+  }).join('')).join('');
+
+  abrirFolha(rotulo(data)==='hoje'? 'Hoje' : rotulo(data), corpo);
+  document.querySelectorAll('.folha [data-abrir]').forEach(b=> b.onclick=()=>{
+    fecharFolha(); estado.atual=b.dataset.abrir; estado.nivel=estado.ses[estado.atual].nivel;
+    estado.aba='treino'; estado.aberto=null; salvar(); render(); window.scrollTo({top:0});
+  });
+  document.querySelectorAll('.folha [data-novo]').forEach(b=> b.onclick=()=>{
+    const [nv,dia,dt]=b.dataset.novo.split('|');
+    fecharFolha(); criarSessao(dt,nv,dia); render(); window.scrollTo({top:0});
+  });
+}
+
+function abrirFolha(titulo, html){
+  const f=document.getElementById('folha');
+  f.innerHTML=`<div class="folhaCaixa"><div class="folhaCab"><b>${titulo}</b><button id="fecharFolha">✕</button></div>
+    <div class="folhaCorpo">${html}</div></div>`;
+  f.className='folha aberta';
+  document.getElementById('fecharFolha').onclick=fecharFolha;
+  f.onclick=e=>{ if(e.target===f) fecharFolha(); };
+}
+function fecharFolha(){ const f=document.getElementById('folha'); f.className='folha'; f.innerHTML=''; }
+
+/* ---------- treino ---------- */
+function telaTreino(){
+  const s=atual(), tela=document.getElementById('tela');
+  if(!s){ tela.innerHTML=`<div class="bloco"><p class="leg">Nenhum treino aberto. Vá na agenda e toque no dia de hoje.</p>
+    <button class="acao forte" id="abrirHoje">Escolher treino de hoje</button></div>`;
+    document.getElementById('abrirHoje').onclick=()=>{ estado.aba='agenda'; render(); abrirDia(hoje()); };
+    return; }
+  const dia=sessaoDia(s), rs=resumo(s);
+  tela.innerHTML=`<div class="lista">${dia.ex.map(p=>cardEx(linha(p))).join('')}</div>
+    <div class="fechar">
+      ${s.fim? `<div class="resumo">
+        <h3>Treino ${dia.letra} encerrado</h3>
+        <div class="nums">
+          <div><b class="num">${rs.feitas}/${rs.total}</b><small>SÉRIES</small></div>
+          <div><b class="num">${rs.carga.toLocaleString('pt-BR')}</b><small>KG MOVIDOS</small></div>
+          <div><b class="num">${rs.prs}</b><small>RECORDES</small></div>
+        </div>
+        ${rs.faltou.length? `<p class="pend">Ficou pra trás: ${rs.faltou.join(', ')}</p>`:'<p class="pend ok">Sessão completa.</p>'}
+        <button class="acao" id="reabrir">Reabrir treino</button></div>`
+      : `<button class="acao forte" id="encerrar">Encerrar treino ${dia.letra}</button>
+         <button class="acao" id="btnRepetir">Repetir as cargas da última vez</button>
+         <p class="leg" style="text-align:center">${rs.feitas} de ${rs.total} séries marcadas</p>`}
+    </div>`;
+
+  tela.querySelectorAll('.cab').forEach(b=> b.onclick=()=>{
+    estado.aberto = estado.aberto===b.dataset.ex? null : b.dataset.ex; render();
+  });
+  tela.querySelectorAll('.serie').forEach(row=>{
+    const ex=row.dataset.ex, i=+row.dataset.i;
+    const inKg=row.querySelector('.kg input'), inRp=row.querySelector('.reps input');
+    const grava=marcar=>{
+      const chave=k(s.id,ex,i), antes=melhorMarca(ex,chave);
+      const feita = marcar===undefined? row.classList.contains('feita') : marcar;
+      const pr = feita && antes>0 && parseFloat(inKg.value)>antes;
+      estado.reg[chave]={kg:inKg.value, reps:inRp.value, ok:feita, pr};
+      salvar();
+    };
+    row.querySelectorAll('.passo').forEach(btn=>{
+      const aplica=()=>{
+        const alvo = btn.dataset.campo==='kg'? inKg : inRp;
+        const v0=parseFloat(alvo.value)||0;
+        const passo=+btn.dataset.d*(btn.dataset.campo==='kg'? passoDe(v0):1);
+        const v=Math.max(0,v0+passo);
+        alvo.value=Number.isInteger(v)? v : v.toFixed(1);
+        alvo.classList.remove('sug'); grava();
+      };
+      let seg=null;
+      btn.onclick=aplica;
+      btn.onpointerdown=()=>{ seg=setTimeout(()=>{ seg=setInterval(aplica,110); },420); };
+      ['pointerup','pointerleave','pointercancel'].forEach(ev=>btn.addEventListener(ev,()=>{clearTimeout(seg);clearInterval(seg);}));
+    });
+    [inKg,inRp].forEach(inp=>{ inp.onfocus=()=>inp.classList.remove('sug'); inp.onchange=()=>grava(); });
+    row.querySelector('.ok').onclick=()=>{
+      const virou=!row.classList.contains('feita');
+      row.classList.toggle('feita',virou); grava(virou);
+      if(virou){
+        if(navigator.vibrate) navigator.vibrate(18);
+        iniciarTimer(linha(dia.ex.find(p=>p.id===ex)).desc);
+        const p=dia.ex.find(p=>p.id===ex);
+        if(exFeito(p)===p.s){ const pr=proximaSerie(); estado.aberto=pr? pr.ex.id : null; }
+      }
+      render();
+    };
+  });
+  const bE=document.getElementById('encerrar');
+  if(bE) bE.onclick=()=>{ s.fim=Date.now(); estado.aberto=null; salvar(); render(); window.scrollTo({top:0}); if(navigator.vibrate) navigator.vibrate([30,50,30]); };
+  const bR=document.getElementById('reabrir');
+  if(bR) bR.onclick=()=>{ s.fim=null; salvar(); render(); };
+  const bP=document.getElementById('btnRepetir');
+  if(bP) bP.onclick=repetirUltima;
+}
+
+function cardEx(e){
+  const s=atual(), ok=exFeito(e), aberto=estado.aberto===e.id, [alvo,aux]=MUSC[e.id];
+  const ref=ultimaVez(s.nivel,s.dia,s.id);
+  let antes=null;
+  if(ref){ for(let i=7;i>=0;i--){ const r=pega(ref.id,e.id,i); if(r.ok&&r.kg){ antes={data:ref.data,...r}; break; } } }
+  const desc = e.desc>=60 ? (e.desc/60).toString().replace('.5','½')+' min' : e.desc+' s';
+  let series='';
+  for(let i=0;i<e.s;i++){
+    const r=pega(s.id,e.id,i);
+    const sKg=r.kg||sugestao(e.id,i,'kg'), sRp=r.reps||sugestao(e.id,i,'reps');
+    series+=`<div class="serie${r.ok?' feita':''}${r.pr?' recorde':''}" data-ex="${e.id}" data-i="${i}">
+      <span class="idx">${i+1}</span>
+      <div class="campo kg"><button class="passo" data-campo="kg" data-d="-1">−</button>
+        <input inputmode="decimal" value="${sKg}" class="${r.kg?'':'sug'}" aria-label="carga série ${i+1}"><u>KG</u>
+        <button class="passo" data-campo="kg" data-d="1">+</button></div>
+      <div class="campo reps"><button class="passo" data-campo="reps" data-d="-1">−</button>
+        <input inputmode="numeric" value="${sRp}" class="${r.reps?'':'sug'}" aria-label="repetições série ${i+1}"><u>REP</u>
+        <button class="passo" data-campo="reps" data-d="1">+</button></div>
+      <button class="ok" aria-label="concluir série ${i+1}">✓</button></div>`;
+  }
+  return `<article class="ex${aberto?' aberto':''}${ok===e.s?' pronto':''}${e.opt?' opt':''}">
+    <button class="cab" data-ex="${e.id}">
+      <div class="mov"><svg viewBox="0 0 64 64" role="img" aria-label="Animação: ${e.nome}">${desenho(e.id)}</svg></div>
+      <div class="txt"><h3>${e.nome}</h3>
+        <p class="pres">${e.s} × ${e.reps} · RIR ${e.rir} · ${desc}</p>
+        ${antes? `<p class="ant">${rotulo(antes.data)}: ${antes.kg} kg × ${antes.reps||'?'}</p>`:''}</div>
+      <span class="cont num">${ok}/${e.s}</span>
+    </button>
+    <div class="painel">${series}
+      <div class="det"><div class="mapa">${corpo(alvo,aux)}</div>
+        <div class="txt">
+          <p class="mus"><b>${alvo.map(m=>NOMES[m]).join(' e ')}</b>${aux.length?' · ajuda: '+aux.map(m=>NOMES[m]).join(', '):''}</p>
+          <p>${e.maq}. ${e.dica}</p>
+          ${e.nota? `<p class="nota">${e.nota}</p>`:''}
+          <p>Ocupado? faça ${ALT[e.id]}</p>
+          <a target="_blank" rel="noopener" href="https://www.youtube.com/results?search_query=${encodeURIComponent(e.nome+' execução correta academia')}">ver execução em vídeo</a>
+        </div></div></div>
+  </article>`;
+}
+
+function proximaSerie(){
+  const s=atual(); if(!s||s.fim) return null;
+  for(const p of sessaoDia(s).ex)
+    for(let i=0;i<p.s;i++) if(!pega(s.id,p.id,i).ok) return {ex:linha(p), serie:i+1};
+  return null;
+}
+function repetirUltima(){
+  const s=atual(), ref=ultimaVez(s.nivel,s.dia,s.id);
+  let n=0;
+  if(ref) sessaoDia(s).ex.forEach(p=>{
+    for(let i=0;i<p.s;i++){
+      if(pega(s.id,p.id,i).kg) continue;
+      const r=pega(ref.id,p.id,i);
+      if(r.kg){ estado.reg[k(s.id,p.id,i)]={kg:r.kg,reps:'',ok:false}; n++; }
+    }
+  });
+  salvar(); render();
+  const el=document.getElementById('progTxt');
+  if(el) el.textContent = n? n+' cargas preenchidas — bata isso' : 'sem registro anterior deste treino';
+}
+
+/* ---------- estatísticas por período ---------- */
+function statsSemana(sem){
+  const ss = sessoes().filter(s=>semanaDe(s.data)===sem);
+  return statsDe(ss);
+}
+function statsMes(mes){
+  return statsDe(sessoes().filter(s=>s.data.slice(0,7)===mes));
+}
+function statsDe(ss){
+  const mus={}, feitoMus={}, ex={};
+  let feitas=0, planejadas=0, carga=0, prs=0;
+  ss.forEach(s=> sessaoDia(s).ex.forEach(p=>{
+    const [alvo,aux]=MUSC[p.id];
+    let ok=0, melhor=0, reps='';
+    for(let i=0;i<p.s;i++){
+      const r=pega(s.id,p.id,i);
+      if(r.ok){ ok++; feitas++; carga+=(parseFloat(r.kg)||0)*(parseFloat(r.reps)||0); if(r.pr) prs++;
+        if(parseFloat(r.kg)>melhor){ melhor=parseFloat(r.kg); reps=r.reps; } }
+    }
+    if(!p.opt){ planejadas+=p.s;
+      alvo.forEach(m=>{mus[m]=(mus[m]||0)+p.s; feitoMus[m]=(feitoMus[m]||0)+ok;});
+      aux.forEach(m=>{mus[m]=(mus[m]||0)+p.s*.5; feitoMus[m]=(feitoMus[m]||0)+ok*.5;});
+    }
+    if(melhor && (!ex[p.id] || melhor>ex[p.id].kg)) ex[p.id]={kg:melhor, reps};
+  }));
+  return {ss, feitas, planejadas, carga:Math.round(carga), prs, mus, feitoMus, ex};
+}
+function comparaExercicios(agora, antes){
+  const saida={subiu:[], igual:[], caiu:[], novo:[]};
+  Object.keys(agora.ex).forEach(id=>{
+    const a=agora.ex[id], b=antes.ex[id];
+    const nome=EX[id].nome;
+    if(!b) saida.novo.push(`${nome} ${a.kg}kg×${a.reps}`);
+    else if(a.kg>b.kg) saida.subiu.push(`${nome} ${b.kg}→${a.kg}kg`);
+    else if(a.kg<b.kg) saida.caiu.push(`${nome} ${b.kg}→${a.kg}kg`);
+    else saida.igual.push(`${nome} ${a.kg}kg×${b.reps}→${a.reps}`);
+  });
+  return saida;
+}
+
+/* ---------- check-in ---------- */
+const PERGUNTAS=[
+  {id:'sono', txt:'Quanto você dormiu, em média, nesta semana?', ops:['menos de 6h','6 a 7h','7 a 8h','mais de 8h']},
+  {id:'energia', txt:'Como estava a disposição nos treinos?', ops:['ruim','oscilou','boa','ótima']},
+  {id:'dor', txt:'Alguma dor articular durante os treinos?', ops:['nenhuma','leve','incomodou','atrapalhou']}
+];
+function respostas(sem){ return (estado.checkin||{})[sem] || {}; }
+
+/* ---------- relatório em texto ---------- */
+function textoRelatorio(sem){
+  const a=statsSemana(sem), b=statsSemana(sem-1);
+  const c=comparaExercicios(a,b);
+  const r=respostas(sem);
+  const nv=NIVEIS[estado.nivel];
+  const n=x=> x%1? x.toFixed(1):x;
+  const L=[];
+  L.push(`RELATÓRIO DA SEMANA ${sem} — programa ${nv.nome}`);
+  L.push(`Sessões: ${a.ss.length} (${a.ss.map(s=>sessaoDia(s).letra+' em '+s.data).join(', ')||'nenhuma'})`);
+  L.push(`Séries: ${a.feitas} de ${a.planejadas} planejadas · Carga movida: ${a.carga.toLocaleString('pt-BR')} kg · Recordes: ${a.prs}`);
+  L.push(`Semana anterior: ${b.ss.length} sessões, ${b.feitas} séries, ${b.carga.toLocaleString('pt-BR')} kg`);
+  L.push('');
+  L.push('VOLUME POR MÚSCULO (feito/planejado):');
+  ['peito','dorsal','ombro','ombroPost','biceps','triceps','quad','posterior','gluteo','panturrilha','abs']
+    .filter(m=>a.mus[m]).forEach(m=> L.push(`- ${NOMES[m]}: ${n(a.feitoMus[m]||0)}/${n(a.mus[m])}`));
+  L.push('');
+  L.push('CARGA POR EXERCÍCIO (melhor série):');
+  Object.keys(a.ex).forEach(id=> L.push(`- ${EX[id].nome}: ${a.ex[id].kg} kg × ${a.ex[id].reps||'?'}`));
+  L.push('');
+  if(c.subiu.length) L.push(`SUBIU: ${c.subiu.join('; ')}`);
+  if(c.igual.length) L.push(`MANTEVE: ${c.igual.join('; ')}`);
+  if(c.caiu.length) L.push(`CAIU: ${c.caiu.join('; ')}`);
+  if(c.novo.length) L.push(`PRIMEIRA VEZ: ${c.novo.join('; ')}`);
+  L.push('');
+  L.push('CHECK-IN:');
+  PERGUNTAS.forEach(p=> L.push(`- ${p.txt} ${r[p.id]||'(não respondeu)'}`));
+  L.push('');
+  L.push('Claude: avalia a semana, aponta o que travou e o que mudar. Pergunta o que faltar.');
+  return L.join('\n');
+}
+function textoMes(mes){
+  const a=statsMes(mes);
+  const sems=[...new Set(a.ss.map(s=>semanaDe(s.data)))].sort((x,y)=>x-y);
+  const n=x=> x%1? x.toFixed(1):x;
+  const L=[];
+  L.push(`FECHAMENTO DO MÊS ${mes} — programa ${NIVEIS[estado.nivel].nome}`);
+  L.push(`Sessões: ${a.ss.length} em ${sems.length} semanas · Séries: ${a.feitas} de ${a.planejadas} · Carga: ${a.carga.toLocaleString('pt-BR')} kg · Recordes: ${a.prs}`);
+  L.push('');
+  L.push('MÉDIA SEMANAL DE VOLUME POR MÚSCULO:');
+  ['peito','dorsal','ombro','ombroPost','biceps','triceps','quad','posterior','gluteo','panturrilha','abs']
+    .filter(m=>a.mus[m]).forEach(m=> L.push(`- ${NOMES[m]}: ${n((a.feitoMus[m]||0)/Math.max(sems.length,1))} séries/semana`));
+  L.push('');
+  L.push('EVOLUÇÃO DE CARGA NO MÊS:');
+  const prim=statsDe(a.ss.filter(s=>semanaDe(s.data)===sems[0]));
+  const ult=statsDe(a.ss.filter(s=>semanaDe(s.data)===sems[sems.length-1]));
+  const c=comparaExercicios(ult,prim);
+  if(c.subiu.length) L.push(`- subiu: ${c.subiu.join('; ')}`);
+  if(c.igual.length) L.push(`- parado: ${c.igual.join('; ')}`);
+  if(c.caiu.length) L.push(`- caiu: ${c.caiu.join('; ')}`);
+  L.push('');
+  L.push('CHECK-INS DO MÊS:');
+  sems.forEach(s=>{ const r=respostas(s);
+    L.push(`- semana ${s}: sono ${r.sono||'?'}, disposição ${r.energia||'?'}, dor ${r.dor||'?'}`); });
+  L.push('');
+  L.push('Claude: fecha o mês, diz o que manter e o que mudar no próximo bloco, e se é hora de trocar exercício, subir volume ou fazer deload.');
+  return L.join('\n');
+}
+
+/* ---------- tela da semana ---------- */
+function telaSemana(){
+  const base = atual()? atual().data : hoje();
+  if(estado.semVer==null) estado.semVer = semanaDe(base);
+  const sem = estado.semVer;
+  const a = statsSemana(sem), b = statsSemana(sem-1);
+  const faixa={ini:[8,12],int:[12,20],avz:[14,22],predio:[3,6]}[estado.nivel];
+  const larg=x=>Math.min(x/26*100,100), n=x=> x%1? x.toFixed(1):x;
+  const ordem=['peito','dorsal','ombro','ombroPost','biceps','triceps','quad','posterior','gluteo','panturrilha','abs'];
+  const c = comparaExercicios(a,b);
+  const r = respostas(sem);
+  const mesAtual = (a.ss[0]||{}).data ? a.ss[0].data.slice(0,7) : hoje().slice(0,7);
+
+  document.getElementById('tela').innerHTML=`<div class="bloco">
+    <div class="calTopo" style="margin-bottom:14px">
+      <button id="semAnt" aria-label="semana anterior">‹</button>
+      <b>Semana ${sem}</b>
+      <button id="semProx" aria-label="próxima semana">›</button>
+    </div>
+
+    <div class="nums" style="margin-bottom:16px">
+      <div><b class="num">${a.ss.length}</b><small>SESSÕES</small></div>
+      <div><b class="num">${a.feitas}</b><small>SÉRIES</small></div>
+      <div><b class="num">${(a.carga/1000).toFixed(1)}t</b><small>CARGA</small></div>
+      <div><b class="num">${a.prs}</b><small>PR</small></div>
+    </div>
+
+    ${a.ss.length? ordem.filter(m=>a.mus[m]).map(m=>{
+      const fora=a.mus[m]<faixa[0]||a.mus[m]>faixa[1];
+      return `<div class="vrow"><span>${NOMES[m]}</span>
+        <div class="vbar">
+          <i class="faixa" style="left:${larg(faixa[0])}%;width:${larg(faixa[1])-larg(faixa[0])}%"></i>
+          <i class="plan${fora?' fora':''}" style="width:${larg(a.mus[m])}%"></i>
+          <i class="feito" style="width:${larg(a.feitoMus[m]||0)}%"></i>
+        </div><b>${n(a.feitoMus[m]||0)}/${n(a.mus[m])}</b></div>`;
+    }).join('') : '<p class="leg">Nenhum treino registrado nesta semana.</p>'}
+
+    ${(c.subiu.length||c.caiu.length||c.igual.length)? `<div class="delta">
+      <h2>Comparado com a semana ${sem-1}</h2>
+      ${c.subiu.length? `<p class="sobe">↑ subiu: ${c.subiu.join(' · ')}</p>`:''}
+      ${c.igual.length? `<p>= manteve: ${c.igual.join(' · ')}</p>`:''}
+      ${c.caiu.length? `<p class="desce">↓ caiu: ${c.caiu.join(' · ')}</p>`:''}
+    </div>`:''}
+
+    <div class="checkin">
+      <h2>Check-in da semana</h2>
+      <p class="leg">Entra no relatório. Sono e dor explicam a maior parte dos platôs, bem antes do programa.</p>
+      ${PERGUNTAS.map(p=>`<div class="perg"><span>${p.txt}</span><div class="chips">
+        ${p.ops.map(o=>`<button class="chip${r[p.id]===o?' sel':''}" data-p="${p.id}" data-v="${o}">${o}</button>`).join('')}
+      </div></div>`).join('')}
+    </div>
+
+    <button class="acao forte" id="copiarSem">Copiar relatório da semana ${sem}</button>
+    <button class="acao" id="copiarMes">Copiar fechamento do mês</button>
+    <p class="leg" id="relMsg">Cole no chat com o Claude pra ele avaliar a semana e te questionar o que faltar.</p>
+    <textarea id="rel" rows="4" readonly style="display:none"></textarea>
+  </div>`;
+
+  document.getElementById('semAnt').onclick=()=>{ if(sem>1){ estado.semVer=sem-1; render(); } };
+  document.getElementById('semProx').onclick=()=>{ estado.semVer=sem+1; render(); };
+  document.querySelectorAll('.chip').forEach(b=> b.onclick=()=>{
+    estado.checkin=estado.checkin||{}; estado.checkin[sem]=estado.checkin[sem]||{};
+    estado.checkin[sem][b.dataset.p]=b.dataset.v; salvar(); render();
+  });
+  const copia=async(txt,msg)=>{
+    const t=document.getElementById('rel'); t.value=txt;
+    try{ await navigator.clipboard.writeText(txt); document.getElementById('relMsg').textContent=msg; }
+    catch(e){ t.style.display='block'; t.removeAttribute('readonly'); t.select();
+      document.getElementById('relMsg').textContent='Selecione o texto abaixo e copie na mão.'; }
+  };
+  document.getElementById('copiarSem').onclick=()=>copia(textoRelatorio(sem),'Relatório copiado. Cola no chat com o Claude.');
+  document.getElementById('copiarMes').onclick=()=>copia(textoMes(mesAtual),'Fechamento do mês copiado. Cola no chat com o Claude.');
+}
+
+/* ---------- ajustes ---------- */
+function telaAjustes(){
+  const nv=NIVEIS[estado.nivel];
+  document.getElementById('tela').innerHTML=`<div class="bloco">
+    <h2>Programa padrão</h2>
+    <p class="leg">É o que a agenda sugere como próximo treino. Você pode escolher outro na hora de abrir o dia.</p>
+    <div class="opcoes">${Object.keys(NIVEIS).map(id=>`<button class="opt${id===estado.nivel?' sel':''}" data-nivel="${id}">
+      <div><b>${NIVEIS[id].nome}</b><small>${NIVEIS[id].sub}</small><small>${NIVEIS[id].plano}</small></div>
+      ${id===estado.nivel?'<span class="marca">✓</span>':''}</button>`).join('')}</div>
+
+    <h2 style="margin-top:20px">Regras do ${nv.nome.toLowerCase()}</h2>
+    <div class="regras">${nv.regras}</div>
+
+    <h2 style="margin-top:20px">Backup</h2>
+    <p class="leg">Salvando em: <b style="color:var(--ink)">${ondeSalva}</b>.${ondeSalva==='só nesta sessão'?' Ao fechar a página os registros somem — abra o arquivo no Chrome em vez do visualizador, ou publique no GitHub Pages.':''}</p>
+    <p class="leg">${sessoes().length} sessões registradas desde ${rotulo(estado.inicio)}.</p>
+    <textarea id="bkp" rows="3" readonly></textarea>
+    <button class="acao" id="btnCopiar">Copiar backup</button>
+    <button class="acao" id="btnRestaurar">Restaurar de um backup</button>
+    <p class="leg" id="bkpMsg"></p>
+    <p class="aviso">Monte a primeira semana com o professor da academia ao lado pra ajustar banco e amplitude. Dor articular aguda: pare o exercício e troque o padrão.</p>
+  </div>`;
+  document.querySelectorAll('[data-nivel]').forEach(b=> b.onclick=()=>{ estado.nivel=b.dataset.nivel; salvar(); render(); window.scrollTo({top:0}); });
+  document.getElementById('btnCopiar').onclick=async()=>{
+    const t=document.getElementById('bkp'); t.value=JSON.stringify(estado);
+    try{ await navigator.clipboard.writeText(t.value); document.getElementById('bkpMsg').textContent='Backup copiado.'; }
+    catch(e){ t.removeAttribute('readonly'); t.select(); document.getElementById('bkpMsg').textContent='Selecione o texto e copie na mão.'; }
+  };
+  document.getElementById('btnRestaurar').onclick=()=>{
+    const t=document.getElementById('bkp'), msg=document.getElementById('bkpMsg');
+    if(t.hasAttribute('readonly')){ t.removeAttribute('readonly'); t.value=''; t.focus();
+      msg.textContent='Cole o backup acima e toque de novo em Restaurar.'; return; }
+    try{
+      const novo=JSON.parse(t.value); if(!novo.reg) throw new Error();
+      estado=Object.assign({nivel:'int',atual:null,aba:'ajustes',aberto:null,mes:null,reg:{},ses:{},inicio:hoje()}, novo);
+      migrar(); salvar(); render(); msg.textContent='Dados restaurados.';
+    }catch(e){ msg.textContent='Esse texto não é um backup válido.'; }
+  };
+}
+
+/* ---------- barra inferior ---------- */
+let tInt=null, tRest=0, tNome='';
+const fmt=s=>Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
+function renderDock(){
+  const el=document.getElementById('proxima'); el.className='proxima';
+  if(estado.aba!=='treino' || !atual()){
+    const prox=proximoDia(estado.nivel);
+    el.innerHTML=`<div class="info"><b>Próximo: ${prox.letra} · ${prox.nome}</b><small>${NIVEIS[estado.nivel].nome}</small></div>
+      <button class="agir" id="comecar">Começar</button>`;
+    document.getElementById('comecar').onclick=()=>{ criarSessao(hoje(), estado.nivel, proximoDia(estado.nivel).id); render(); window.scrollTo({top:0}); };
+    return;
+  }
+  const p=proximaSerie();
+  if(!p){ const s=atual();
+    el.innerHTML=`<div class="info"><b>Treino ${sessaoDia(s).letra} ${s.fim?'encerrado':'concluído'}</b><small>${rotulo(s.data)}</small></div>`; return; }
+  el.innerHTML=`<div class="info"><b>${p.ex.nome}</b><small>série ${p.serie} de ${p.ex.s} · ${p.ex.reps} reps · RIR ${p.ex.rir}</small></div>
+    <button class="agir" id="irPara">Ir</button>`;
+  document.getElementById('irPara').onclick=()=>{
+    estado.aberto=p.ex.id; render();
+    const alvo=document.querySelector('.ex.aberto'); if(alvo) alvo.scrollIntoView({behavior:'smooth',block:'center'});
+  };
+}
+function iniciarTimer(seg){
+  clearInterval(tInt); tRest=seg;
+  const p=proximaSerie(); tNome=p? p.ex.nome : 'fim do treino';
+  pinta();
+  tInt=setInterval(()=>{ tRest--; pinta();
+    if(tRest<=0){ clearInterval(tInt); tInt=null;
+      if(navigator.vibrate) navigator.vibrate([120,60,120]);
+      setTimeout(renderDock,6000); }
+  },1000);
+}
+function pinta(){
+  const el=document.getElementById('proxima');
+  el.className='proxima descanso'+(tRest<=0?' zerado':'');
+  el.innerHTML=`<div class="relogio">${fmt(Math.max(tRest,0))}</div>
+    <div class="info"><b>${tRest>0?'Descanso':'Pode ir'}</b><small>depois: ${tNome}</small></div>
+    <button class="agir" id="pular">${tRest>0?'Pular':'Ok'}</button>`;
+  document.getElementById('pular').onclick=()=>{ clearInterval(tInt); tInt=null; renderDock(); };
+}
+function renderAbas(){
+  const ic={
+    agenda:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
+    treino:'<path d="M4 12h16M6 7v10M18 7v10M2 10v4M22 10v4"/>',
+    volume:'<path d="M4 20V9M10 20V4M16 20v-7M22 20v-3"/>',
+    ajustes:'<circle cx="12" cy="12" r="3.2"/><path d="M12 2v3M12 19v3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M2 12h3M19 12h3M4.9 19.1L7 17M17 7l2.1-2.1"/>'
+  };
+  const nomes={agenda:'Agenda', treino:'Treino', volume:'Semana', ajustes:'Ajustes'};
+  const nav=document.getElementById('abas'); nav.innerHTML='';
+  Object.keys(nomes).forEach(id=>{
+    const b=document.createElement('button');
+    b.className='aba'+(estado.aba===id?' sel':'');
+    b.innerHTML=`<svg viewBox="0 0 24 24">${ic[id]}</svg>${nomes[id]}`;
+    b.onclick=()=>{ estado.aba=id; salvar(); render(); window.scrollTo({top:0}); };
+    nav.appendChild(b);
+  });
+}
+if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
+carregar();
+
+</script>
