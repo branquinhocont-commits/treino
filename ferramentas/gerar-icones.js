@@ -1,34 +1,29 @@
 /* Gera os PNG do manifest a partir do mesmo desenho do <link rel=icon>:
-   barra branca com anilhas amarelas sobre o fundo --ground.
-   Sem dependência externa — PNG escrito na mão com zlib do próprio Node.
+   uma anilha olímpica vermelha (o treino A, 25 kg) vista de frente, com o
+   sulco, o miolo de aço e o furo, sobre o grafite do app.
+   Sem dependência externa: PNG escrito na mão com zlib do próprio Node.
    Rodar: node ferramentas/gerar-icones.js                                  */
 const fs = require('fs');
 const zlib = require('zlib');
 const path = require('path');
 
-const GROUND = [0x0B, 0x0D, 0x10];
-const INK    = [0xF4, 0xF6, 0xF8];
-const SINAL  = [0xFF, 0xD4, 0x47];
+const FUNDO = [0x13, 0x14, 0x17];
 
-/* o ícone em coordenadas 0..64, igual ao SVG que já está no index.html */
-const TRACOS = [
-  { x1:14, y1:32, x2:50, y2:32, w:5, cor:INK   },
-  { x1:16, y1:22, x2:16, y2:42, w:5, cor:INK   },
-  { x1:48, y1:22, x2:48, y2:42, w:5, cor:INK   },
-  { x1: 9, y1:26, x2: 9, y2:38, w:5, cor:SINAL },
-  { x1:55, y1:26, x2:55, y2:38, w:5, cor:SINAL }
+/* a anilha em coordenadas 0..64, de fora para dentro: cada disco cobre o anterior */
+const DISCOS = [
+  { r:23.0, cor:[0xE5, 0x46, 0x3C] },      /* borracha vermelha */
+  { r:21.4, cor:[0xC4, 0x3B, 0x33] },      /* aro externo, mais escuro */
+  { r:20.2, cor:[0xE5, 0x46, 0x3C] },
+  { r:16.0, cor:[0xBD, 0x38, 0x30] },      /* sulco */
+  { r:13.0, cor:[0xE5, 0x46, 0x3C] },
+  { r: 9.6, cor:[0x8E, 0x92, 0x98] },      /* borda do miolo */
+  { r: 9.0, cor:[0xC9, 0xCC, 0xD1] },      /* miolo de aço */
+  { r: 6.6, cor:[0xB4, 0xB8, 0xBE] },
+  { r: 6.0, cor:[0xC9, 0xCC, 0xD1] },
+  { r: 4.0, cor:[0x0C, 0x0D, 0x0F] }       /* furo */
 ];
 
-const AA = 3;                                    /* supersampling por eixo */
-
-function distSeg(px, py, x1, y1, x2, y2){
-  const dx = x2 - x1, dy = y2 - y1;
-  const len2 = dx*dx + dy*dy;
-  let t = len2 ? ((px-x1)*dx + (py-y1)*dy) / len2 : 0;
-  t = Math.max(0, Math.min(1, t));
-  const cx = x1 + t*dx, cy = y1 + t*dy;
-  return Math.hypot(px-cx, py-cy);
-}
+const AA = 4;                                    /* supersampling por eixo */
 
 /* cantos arredondados r=14 no espaço 0..64 */
 function dentroDoFundo(px, py, lado){
@@ -39,35 +34,30 @@ function dentroDoFundo(px, py, lado){
   return Math.hypot(r-x, r-y) <= r;
 }
 
-function desenhar(lado, escalaArte){
+/* quadrado=true: sem canto arredondado (o Android recorta o ícone maskable) */
+function desenhar(lado, escalaArte, quadrado){
   const buf = Buffer.alloc(lado * lado * 4);
   const esc = lado / 64;
   const centro = lado / 2;
   for(let y = 0; y < lado; y++){
     for(let x = 0; x < lado; x++){
-      let fundo = 0, acum = [0,0,0], cob = 0;
+      let fundo = 0; const acum = [0,0,0];
       for(let sy = 0; sy < AA; sy++) for(let sx = 0; sx < AA; sx++){
         const px = x + (sx + 0.5)/AA, py = y + (sy + 0.5)/AA;
-        if(dentroDoFundo(px, py, lado)) fundo++;
+        if(quadrado || dentroDoFundo(px, py, lado)) fundo++;
         /* leva o ponto para o espaço da arte, respeitando a zona segura */
         const ax = ((px - centro) / escalaArte + centro) / esc;
         const ay = ((py - centro) / escalaArte + centro) / esc;
-        for(const t of TRACOS){
-          if(distSeg(ax, ay, t.x1, t.y1, t.x2, t.y2) <= t.w/2){
-            acum[0] += t.cor[0]; acum[1] += t.cor[1]; acum[2] += t.cor[2];
-            cob++; break;
-          }
-        }
+        const d = Math.hypot(ax - 32, ay - 32);
+        let cor = FUNDO;
+        for(const disco of DISCOS) if(d <= disco.r) cor = disco.cor;
+        acum[0] += cor[0]; acum[1] += cor[1]; acum[2] += cor[2];
       }
       const amostras = AA*AA;
-      const alfaFundo = fundo / amostras;
       const p = (y*lado + x) * 4;
-      if(alfaFundo === 0){ buf[p+3] = 0; continue; }
-      const mistura = cob / amostras;
-      const arte = cob ? [acum[0]/cob, acum[1]/cob, acum[2]/cob] : [0,0,0];
-      for(let c = 0; c < 3; c++)
-        buf[p+c] = Math.round(GROUND[c]*(1-mistura) + arte[c]*mistura);
-      buf[p+3] = Math.round(255 * alfaFundo);
+      if(fundo === 0){ buf[p+3] = 0; continue; }
+      for(let c = 0; c < 3; c++) buf[p+c] = Math.round(acum[c] / amostras);
+      buf[p+3] = Math.round(255 * fundo / amostras);
     }
   }
   return buf;
@@ -113,12 +103,12 @@ function png(lado, rgba){
 
 const destino = path.join(__dirname, '..', 'icones');
 const saidas = [
-  ['icone-192.png',           192, 1.00],
-  ['icone-512.png',           512, 1.00],
-  ['icone-mascara-512.png',   512, 0.62]   /* zona segura de 20% para Android */
+  ['icone-192.png',           192, 1.00, false],
+  ['icone-512.png',           512, 1.00, false],
+  ['icone-mascara-512.png',   512, 0.90, true]    /* zona segura para o recorte do Android */
 ];
-for(const [nome, lado, escala] of saidas){
+for(const [nome, lado, escala, quadrado] of saidas){
   const arq = path.join(destino, nome);
-  fs.writeFileSync(arq, png(lado, desenhar(lado, escala)));
+  fs.writeFileSync(arq, png(lado, desenhar(lado, escala, quadrado)));
   console.log('gravado', nome, fs.statSync(arq).size, 'bytes');
 }

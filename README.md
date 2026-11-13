@@ -1,7 +1,8 @@
 # Treino
 
-App pessoal de registro de treino de musculação, com o programa embutido e auditoria
-de volume semanal. PWA instalável, offline, sem servidor, sem conta, um usuário.
+App pessoal de treino de musculação: programa embutido (Massa 2027), meta de carga já
+preenchida em cada série, descanso automático e volume semanal por músculo. PWA instalável,
+offline, sem servidor, sem conta, um usuário. Um arquivo só (`index.html`), sem build.
 
 Leia o **[HANDOFF.md](HANDOFF.md)** antes de mexer em qualquer coisa.
 
@@ -22,6 +23,17 @@ node ferramentas/publicar.js
 
 Roda os validadores e os testes de comportamento, e só então carimba uma versão nova
 no `sw.js`. Sem versão nova, o celular continua com o app antigo.
+
+Para rodar só os testes, sem carimbar:
+
+```bash
+node ferramentas/validar.js
+node ferramentas/testar-comportamento.js
+```
+
+`ferramentas/backup-real.json` (cópia do dado do celular, usada no teste de migração) está no
+`.gitignore` e não deve ser publicada. Sem ela os testes rodam sobre `dado-antigo.json`, que
+é sintético.
 
 ## Publicar no GitHub Pages
 

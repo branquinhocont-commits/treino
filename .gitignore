@@ -2,3 +2,5 @@ node_modules/
 dist/
 *.zip
 .DS_Store
+# cópia do dado real do celular, usada só nos testes locais. Nunca publicar.
+ferramentas/backup-real.json
