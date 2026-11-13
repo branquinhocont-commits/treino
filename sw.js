@@ -4,7 +4,7 @@
 
    VERSAO é carimbada por ferramentas/publicar.js. Trocar de versão
    invalida todo o cache antigo no activate.                              */
-const VERSAO = 'v2026-11-12-01';
+const VERSAO = 'v2026-11-13-01';
 const CACHE  = 'treino-' + VERSAO;
 
 const CASCA = [

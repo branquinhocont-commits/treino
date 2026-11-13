@@ -130,6 +130,10 @@ a{color:inherit}
 .pilha{display:flex;flex-direction:column;gap:10px}
 .lk{display:inline-flex;align-items:center;gap:4px;min-height:48px;padding:0 2px;color:var(--dim);font-weight:600;font-size:14.5px}
 .lk:active{color:var(--giz)}
+.lk.video{color:var(--giz);text-decoration:none}
+.lk.video svg,.btn svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}
+.item.toca{cursor:pointer}
+.item.toca:active{opacity:.6}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
 .chip{min-height:48px;min-width:48px;justify-content:center;padding:0 16px;border-radius:24px;background:var(--sup2);font-weight:600;font-size:14.5px;display:inline-flex;align-items:center}
 .chip.sel{background:var(--giz);color:var(--tinta)}
@@ -1959,7 +1963,7 @@ function telaHoje(){
   const comLista = dia && (sg.tipo==='plano' || sg.tipo==='reposicao' || sg.tipo==='descanso');
   const previa = comLista ? `<div class="sec"><h2>${sg.tipo==='descanso'?dia.nome:'No treino'}</h2><button class="lk" data-a="irProg" data-dia="${dia.id}">Editar</button></div>
     <div class="lista">${dia.ex.map(p=>{ const m=metaDe(p), e=EX[p.id];
-      return `<div class="item">${mov(p.id)}<div class="tx"><b>${e.nome}</b><small>${p.s} × ${p.reps}${p.opt?', opcional':''}</small></div>
+      return `<div class="item toca" role="button" tabindex="0" data-a="como" data-ex="${p.id}">${mov(p.id)}<div class="tx"><b>${e.nome}</b><small>${p.s} × ${p.reps}${p.opt?', opcional':''}</small></div>
         <div class="dir">${m? `<b class="num">${nfmt(m.kg)} kg</b>${m.sobe?'<span class="sobe">subir carga</span>':'× '+m.reps}` : 'primeira vez'}</div></div>`; }).join('')}</div>` : '';
   /* com o dia resolvido (feito ou descanso), o que vem depois */
   let depois='';
@@ -2118,19 +2122,23 @@ function cardEx(e,s){
       ${e.nota?`<p class="nota-ex">${e.nota}</p>`:''}
       ${series}
       <div class="acoes">
+        <a class="lk video" target="_blank" rel="noopener" href="${videoUrl(e.id)}">${PLAY}Ver vídeo</a>
         ${e.fora? '' : pl? `<button class="lk" data-a="despular" data-ex="${e.id}">Desfazer "não fiz"</button>` : `<button class="lk" data-a="pular" data-ex="${e.id}">Não fiz</button>`}
         ${e.fora? '' : `<button class="lk" data-a="trocar" data-n="${s.nivel}" data-dia="${s.dia}" data-ex="${e.id}">Trocar exercício</button>`}
         <button class="lk" data-a="como" data-ex="${e.id}">Como fazer</button>
       </div>
     </div>`:''}</article>`;
 }
+/* busca no YouTube pelo nome do exercício: não quebra quando um vídeo sai do ar */
+const videoUrl = id => 'https://www.youtube.com/results?search_query='+encodeURIComponent(EX[id].nome+' execução correta');
+const PLAY='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M10 8.5v7l6-3.5z"/></svg>';
 function comoFazer(id){
   const e=EX[id], [alvo,aux]=MUSC[id];
-  abrirFolha(e.nome, `<div class="como">${mov(id,'gde vivo')}<div class="mapa">${corpo(alvo,aux)}</div></div>
+  abrirFolha(e.nome, `<a class="btn pri" target="_blank" rel="noopener" href="${videoUrl(id)}">${PLAY}Ver vídeo do exercício</a>
+    <div class="como">${mov(id,'gde vivo')}<div class="mapa">${corpo(alvo,aux)}</div></div>
     <div class="passoapasso"><p><b>${maiusc(alvo.map(x=>NOMES[x]).join(' e '))}</b>${aux.length?', com ajuda de '+aux.map(x=>NOMES[x]).join(', '):''}</p>
     <p>${e.maq}. ${e.dica}</p>
-    <p class="dim">Aparelho ocupado: ${ALT[id]}.</p></div>
-    <a class="btn" target="_blank" rel="noopener" href="https://www.youtube.com/results?search_query=${encodeURIComponent(e.nome+' execução correta')}">Ver execução em vídeo</a>`);
+    <p class="dim">Aparelho ocupado: ${ALT[id]}.</p></div>`);
 }
 function telaResumo(s,dia,lista){
   const r=resumo(s), du=duracao(s);
